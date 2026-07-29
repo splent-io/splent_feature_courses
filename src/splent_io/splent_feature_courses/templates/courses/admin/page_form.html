@@ -68,15 +68,41 @@
                 {% for attachment in attachments %}
                 <tr>
                     <td>{{ attachment.name or _('Attachment') }}</td>
-                    <td style="width:200px" class="text-end">
+                    <td style="width:260px" class="text-end">
                         <a href="/media/file/{{ attachment.media_item_id }}" class="btn btn-sm btn-outline-secondary">{{ _('Open') }}</a>
+                        <form method="POST"
+                              action="{{ url_for('courses.admin_page_detach', attachment_id=attachment.id) }}"
+                              class="d-inline"
+                              onsubmit="return confirm('{{ _('Remove this file? The stored copy goes with it.') }}');">
+                            {{ confirm_form.hidden_tag() }}
+                            <button type="submit" class="btn btn-sm btn-outline-danger">{{ _('Remove') }}</button>
+                        </form>
                     </td>
                 </tr>
                 {% else %}
-                <tr><td class="text-muted text-center py-3">{{ _('No files attached to this page.') }}</td></tr>
+                <tr><td colspan="2" class="text-muted text-center py-3">{{ _('No files attached to this page.') }}</td></tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+    <div class="card-body border-top">
+        <form method="POST"
+              action="{{ url_for('courses.admin_page_attach', page_id=page.id) }}"
+              enctype="multipart/form-data"
+              class="row g-2 align-items-end">
+            {{ attachment_form.hidden_tag() }}
+            <div class="col-sm-5">
+                {{ attachment_form.file.label(class="form-label") }}
+                {{ attachment_form.file(class="form-control") }}
+            </div>
+            <div class="col-sm-5">
+                {{ attachment_form.name.label(class="form-label") }}
+                {{ attachment_form.name(class="form-control", placeholder=_('Optional, defaults to the file name')) }}
+            </div>
+            <div class="col-sm-2">
+                {{ attachment_form.submit(class="btn btn-primary w-100") }}
+            </div>
+        </form>
     </div>
 </div>
 {% endif %}

@@ -12,6 +12,7 @@ the conversion in one place so the two directions cannot drift apart.
 
 from flask_babel import lazy_gettext as _l
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired
 from wtforms import (
     BooleanField,
     DateTimeLocalField,
@@ -113,6 +114,23 @@ class PageForm(VisibilityForm):
     position = IntegerField(_l("Position"), validators=[Optional(), NumberRange(min=0)])
     preview = SubmitField(_l("Preview"))
     submit = SubmitField(_l("Save page"))
+
+
+class AttachmentForm(FlaskForm):
+    """A file to hang off a page.
+
+    The upload is stored as restricted media owned by this feature, so it
+    is withheld exactly as long as its page is. That is the requirement
+    that made static file serving impossible: the material is PDFs, and
+    students guess URLs.
+    """
+
+    file = FileField(
+        _l("File"),
+        validators=[FileRequired(_l("Choose a file to upload."))],
+    )
+    name = StringField(_l("Display name"), validators=[Optional(), Length(max=255)])
+    submit = SubmitField(_l("Attach file"))
 
 
 class ConfirmForm(FlaskForm):

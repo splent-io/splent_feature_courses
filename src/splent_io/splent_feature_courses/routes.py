@@ -37,6 +37,7 @@ from mdit_py_plugins.tasklists import tasklists_plugin
 
 from splent_io.splent_feature_courses import courses_bp
 from splent_io.splent_feature_courses.forms import (
+    AttachmentForm,
     CategoryForm,
     ConfirmForm,
     CopyCourseForm,
@@ -687,6 +688,48 @@ def admin_page_edit(page_id):
     return _page_form(form, course, page)
 
 
+@courses_bp.route("/admin/courses/pages/<int:page_id>/attach", methods=["POST"])
+@role_required(*STAFF_ROLES)
+def admin_page_attach(page_id):
+    """Hang a file off a page, withheld for as long as the page is.
+
+    The bytes go to the media library as a restricted item owned by this
+    feature, so serving them asks whether the page is visible. Nothing
+    here has to remember to protect the file.
+    """
+    page = _page_or_404(page_id)
+    form = AttachmentForm()
+    if not form.validate_on_submit():
+        flash(_("Choose a file to upload."), "warning")
+        return redirect(url_for("courses.admin_page_edit", page_id=page.id))
+
+    attachment = courses_service.attach_file(
+        page, form.file.data, name=(form.name.data or "").strip()
+    )
+    if attachment is None:
+        flash(_("That file could not be stored."), "danger")
+    else:
+        flash(_("Attached %(name)s.", name=attachment.name), "success")
+    return redirect(url_for("courses.admin_page_edit", page_id=page.id))
+
+
+@courses_bp.route(
+    "/admin/courses/attachments/<int:attachment_id>/detach", methods=["POST"]
+)
+@role_required(*STAFF_ROLES)
+def admin_page_detach(attachment_id):
+    """Remove a file from a page, and the stored bytes with it."""
+    attachment = courses_service.attachments.get_by_id(attachment_id)
+    if attachment is None:
+        abort(404)
+    if not ConfirmForm().validate_on_submit():
+        abort(400)
+    page_id, name = attachment.page_id, attachment.name
+    courses_service.detach_file(attachment)
+    flash(_("Removed %(name)s.", name=name), "success")
+    return redirect(url_for("courses.admin_page_edit", page_id=page_id))
+
+
 @courses_bp.route("/admin/courses/pages/<int:page_id>/delete", methods=["POST"])
 @role_required(*STAFF_ROLES)
 def admin_page_delete(page_id):
@@ -715,7 +758,12 @@ def _page_form(form, course, page):
         course=course,
         page=page,
         preview_html=preview_html,
+        attachment_form=AttachmentForm(),
+        confirm_form=ConfirmForm(),
+        # The full list, not the reader's view: staff manage the files of a
+        # page that is still withheld, which is the normal case while next
+        # week's session is being prepared.
         attachments=(
-            courses_service.visible_attachments(page, current_user) if page else []
+            courses_service.attachments.list_for_page(page.id) if page else []
         ),
     )

@@ -32,14 +32,17 @@ cli_version = "1.15.0"
 
 # ── Feature Contract (auto-generated) ────────────────────────────────────────
 # Do not edit manually — re-run `splent feature:contract --write` to refresh.
-# Preserved across refreshes: description, category, tags, env, and
-# requires.features_manual (dependencies invisible to static analysis).
+# Preserved across refreshes: description, category, tags, env,
+# requires.features_manual (dependencies invisible to static analysis)
+# and provides.routes_manual (routes built from configuration at
+# registration time, which have no literal path to find in source).
 [tool.splent.contract]
 description = "courses feature"
 archetype = "full"
 
 [tool.splent.contract.provides]
-routes     = ["/admin/courses", "/admin/courses/<int:course_id>/categories/new", "/admin/courses/<int:course_id>/copy", "/admin/courses/<int:course_id>/delete", "/admin/courses/<int:course_id>/edit", "/admin/courses/<int:course_id>/pages/new", "/admin/courses/attachments/<int:attachment_id>/detach", "/admin/courses/categories/<int:category_id>/delete", "/admin/courses/categories/<int:category_id>/edit", "/admin/courses/new", "/admin/courses/pages/<int:page_id>/attach", "/admin/courses/pages/<int:page_id>/delete", "/admin/courses/pages/<int:page_id>/edit"]
+routes     = ["/", "/<COURSES_PATH>", "/<COURSES_PATH>/<course_slug>", "/<COURSES_PATH>/<course_slug>/<COURSES_CATEGORY_SEGMENT>/<category_slug>", "/<COURSES_PATH>/<course_slug>/<COURSES_PAGE_SEGMENT>/<page_slug>", "/<COURSES_PATH>/search", "/admin/courses", "/admin/courses/<int:course_id>/categories/new", "/admin/courses/<int:course_id>/copy", "/admin/courses/<int:course_id>/delete", "/admin/courses/<int:course_id>/edit", "/admin/courses/<int:course_id>/pages/new", "/admin/courses/attachments/<int:attachment_id>/detach", "/admin/courses/categories/<int:category_id>/delete", "/admin/courses/categories/<int:category_id>/edit", "/admin/courses/new", "/admin/courses/pages/<int:page_id>/attach", "/admin/courses/pages/<int:page_id>/delete", "/admin/courses/pages/<int:page_id>/edit"]
+routes_manual = ["/", "/<COURSES_PATH>", "/<COURSES_PATH>/<course_slug>", "/<COURSES_PATH>/<course_slug>/<COURSES_CATEGORY_SEGMENT>/<category_slug>", "/<COURSES_PATH>/<course_slug>/<COURSES_PAGE_SEGMENT>/<page_slug>", "/<COURSES_PATH>/search"]
 blueprints = []
 models     = ["Category", "Course", "Page", "PageAttachment"]
 commands   = ["copy-course", "hide", "new-course", "publish", "status"]

@@ -30,34 +30,34 @@ exclude = ["*.tests", "*.tests.*"]
 [tool.splent]
 cli_version = "1.15.0"
 
-# ── Feature Contract ──────────────────────────────────────────────────────────
-# Declares what this feature provides to and requires from the product.
-# Used by `splent feature:check` and `splent product:derive` for validation.
+# ── Feature Contract (auto-generated) ────────────────────────────────────────
+# Do not edit manually — re-run `splent feature:contract --write` to refresh.
+# Preserved across refreshes: description, category, tags, env, and
+# requires.features_manual (dependencies invisible to static analysis).
 [tool.splent.contract]
 description = "courses feature"
+archetype = "full"
 
 [tool.splent.contract.provides]
-# Routes exposed by this feature
-routes = ["/courses"]
-# Blueprint names registered into Flask
-blueprints = ["courses_bp"]
-# SQLAlchemy models introduced by this feature
-models = []
-# CLI commands added by this feature
-commands = []
+routes     = ["/admin/courses", "/admin/courses/<int:course_id>/categories/new", "/admin/courses/<int:course_id>/copy", "/admin/courses/<int:course_id>/delete", "/admin/courses/<int:course_id>/edit", "/admin/courses/<int:course_id>/pages/new", "/admin/courses/categories/<int:category_id>/delete", "/admin/courses/categories/<int:category_id>/edit", "/admin/courses/new", "/admin/courses/pages/<int:page_id>/delete", "/admin/courses/pages/<int:page_id>/edit"]
+blueprints = []
+models     = ["Category", "Course", "Page", "PageAttachment"]
+commands   = ["copy-course", "hide", "new-course", "publish", "status"]
+hooks      = ["layout.authenticated_sidebar"]
+services   = ["CoursesService"]
+signals    = []
+translations = []
+docker     = []
 
 [tool.splent.contract.requires]
-# Other SPLENT features this feature depends on (e.g. ["auth", "mail"])
-features = []
-# Environment variables this feature expects to be set
-env_vars = []
+features = ["auth"]
+features_optional = ["media"]
+env_vars = ["COURSES_CATEGORY_SEGMENT", "COURSES_DEFAULT_CATEGORIES", "COURSES_DESCRIPTION_TEMPLATE", "COURSES_NAME_PREFIX", "COURSES_PAGE_SEGMENT", "COURSES_PATH", "COURSES_TIMEZONE"]
+signals  = []
 
-# ── Extension points ──────────────────────────────────────────────────────────
-# Declares what other features can override or extend via refinement.
-# See: splent feature:xray
 [tool.splent.contract.extensible]
-services = []
-templates = []
-models = []
-hooks = []
-routes = false
+services  = ["CoursesService"]
+templates = ["courses/admin/category_form.html", "courses/admin/course_form.html", "courses/admin/courses.html", "courses/admin/page_form.html", "courses/category.html", "courses/course.html", "courses/hooks/admin_sidebar.html", "courses/index.html", "courses/page.html", "courses/search.html"]
+models    = ["Category", "Course", "Page", "PageAttachment"]
+hooks     = ["layout.authenticated_sidebar"]
+routes    = false

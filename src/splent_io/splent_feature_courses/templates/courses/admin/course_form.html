@@ -1,0 +1,124 @@
+{% extends "base_template.html" %}
+{% from "courses/admin/_form.html" import field, flashes, visibility, state_badge, delete_button %}
+
+{% block title %}{{ course.name if course else _('New course') }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-start gap-2 mb-4">
+    <h1 class="h3 mb-0">{{ course.name if course else _('New course') }}</h1>
+    <a href="{{ url_for('courses.admin_index') }}" class="btn btn-outline-secondary">{{ _('Back to courses') }}</a>
+</div>
+
+{{ flashes() }}
+
+<form method="POST" class="card mb-4">
+    <div class="card-body">
+        {{ form.hidden_tag() }}
+        {{ field(form.name) }}
+        {{ field(form.description, rows=3) }}
+
+        {% if course %}
+            {{ visibility(form) }}
+        {% else %}
+            {# A new course is born withheld. It is filled before anyone
+               sees it, so the release date is a decision for later. #}
+            <div class="form-check mb-3">
+                {{ form.hidden(class="form-check-input") }}
+                {{ form.hidden.label(class="form-check-label") }}
+                <div class="form-text">{{ _('Leave this on until the year is ready. You can schedule it once it has material.') }}</div>
+            </div>
+            {{ field(form.categories, rows=5) }}
+            <div class="form-text mb-3">{{ _('One section per line. These are the divisions of the course, such as theory and lab work.') }}</div>
+        {% endif %}
+    </div>
+    <div class="card-footer text-end">
+        <a href="{{ url_for('courses.admin_index') }}" class="btn btn-link text-muted">{{ _('Cancel') }}</a>
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+
+{% if course %}
+<div class="d-flex flex-column align-items-start gap-2 mb-3">
+    <h2 class="h4 mb-0">{{ _('Contents') }}</h2>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('courses.admin_category_new', course_id=course.id) }}" class="btn btn-sm btn-primary">{{ _('New section') }}</a>
+        <a href="{{ url_for('courses.admin_page_new', course_id=course.id) }}" class="btn btn-sm btn-outline-primary">{{ _('New page') }}</a>
+    </div>
+</div>
+
+{% for category, pages in sections %}
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <strong>{{ category.name }}</strong>
+            {{ state_badge(category) }}
+            {% if not category.is_released() %}
+            <div class="text-muted small">{{ _('Everything in this section is withheld with it.') }}</div>
+            {% endif %}
+        </div>
+        <div class="text-end">
+            <a href="{{ url_for('courses.admin_page_new', course_id=course.id, category=category.id) }}"
+               class="btn btn-sm btn-outline-primary">{{ _('New page') }}</a>
+            <a href="{{ url_for('courses.admin_category_edit', category_id=category.id) }}"
+               class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</a>
+            {{ delete_button(url_for('courses.admin_category_delete', category_id=category.id), confirm_form,
+                             _('Remove this section and its pages?')) }}
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <tbody>
+                {% for page in pages %}
+                <tr>
+                    <td>
+                        {{ page.name }}
+                        <div class="text-muted small">{{ page_url(course, page) }}</div>
+                    </td>
+                    <td style="width:220px">{{ state_badge(page) }}</td>
+                    <td style="width:200px" class="text-end">
+                        <a href="{{ url_for('courses.admin_page_edit', page_id=page.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</a>
+                        {{ delete_button(url_for('courses.admin_page_delete', page_id=page.id), confirm_form,
+                                         _('Remove this page?')) }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td class="text-muted text-center py-3">{{ _('No pages in this section yet.') }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<p class="text-muted">{{ _('This course has no sections yet.') }}</p>
+{% endfor %}
+
+{% if uncategorised %}
+<div class="card mb-3">
+    <div class="card-header">
+        <strong>{{ _('Outside any section') }}</strong>
+        <div class="text-muted small">{{ _('These pages are reachable but are listed on their own. Give them a section to file them.') }}</div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <tbody>
+                {% for page in uncategorised %}
+                <tr>
+                    <td>
+                        {{ page.name }}
+                        <div class="text-muted small">{{ page_url(course, page) }}</div>
+                    </td>
+                    <td style="width:220px">{{ state_badge(page) }}</td>
+                    <td style="width:200px" class="text-end">
+                        <a href="{{ url_for('courses.admin_page_edit', page_id=page.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</a>
+                        {{ delete_button(url_for('courses.admin_page_delete', page_id=page.id), confirm_form,
+                                         _('Remove this page?')) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}

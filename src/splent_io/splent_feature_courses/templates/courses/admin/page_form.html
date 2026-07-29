@@ -1,0 +1,83 @@
+{% extends "base_template.html" %}
+{% from "courses/admin/_form.html" import field, flashes, visibility %}
+
+{% block title %}{{ page.name if page else _('New page') }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-start gap-2 mb-4">
+    <div>
+        <h1 class="h3 mb-0">{{ page.name if page else _('New page') }}</h1>
+        <p class="text-muted mb-0">{{ course.name }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('courses.admin_course_edit', course_id=course.id) }}" class="btn btn-outline-secondary">{{ _('Back to the course') }}</a>
+        {% if page %}
+        <a href="{{ page_url(course, page) }}" class="btn btn-outline-secondary">{{ _('View') }}</a>
+        {% endif %}
+    </div>
+</div>
+
+{{ flashes() }}
+
+<form method="POST" class="card mb-4">
+    <div class="card-body">
+        {{ form.hidden_tag() }}
+        <div class="row g-3">
+            <div class="col-md-8">{{ field(form.name) }}</div>
+            <div class="col-md-4">{{ field(form.category_id) }}</div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-lg-{{ '6' if preview_html is not none else '12' }}">
+                {{ form.body_md.label(class="form-label") }}
+                {{ form.body_md(class="form-control font-monospace", rows=24) }}
+                <div class="form-text">{{ _('Markdown. Tables, footnotes and existing HTML are all kept.') }}</div>
+                {% for error in form.body_md.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+            {% if preview_html is not none %}
+            {# Rendered by the same helper the public page uses, so what
+               you approve here is exactly what a reader is served. #}
+            <div class="col-lg-6">
+                <label class="form-label">{{ _('Preview') }}</label>
+                <div class="border rounded p-3 prose" style="max-height:36rem;overflow:auto">{{ preview_html }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="row g-3 mt-1">
+            <div class="col-md-4">{{ field(form.position, type="number", min="0") }}</div>
+            <div class="col-md-8">{{ visibility(form) }}</div>
+        </div>
+    </div>
+    <div class="card-footer text-end">
+        <a href="{{ url_for('courses.admin_course_edit', course_id=course.id) }}" class="btn btn-link text-muted">{{ _('Cancel') }}</a>
+        {{ form.preview(class="btn btn-outline-secondary") }}
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+
+{% if page %}
+<div class="card">
+    <div class="card-header">
+        <strong>{{ _('Files') }}</strong>
+        <div class="text-muted small">{{ _('Attachments inherit this page. They are refused until it is released, to a link that was forwarded exactly as to a guess.') }}</div>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <tbody>
+                {% for attachment in attachments %}
+                <tr>
+                    <td>{{ attachment.name or _('Attachment') }}</td>
+                    <td style="width:200px" class="text-end">
+                        <a href="/media/file/{{ attachment.media_item_id }}" class="btn btn-sm btn-outline-secondary">{{ _('Open') }}</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td class="text-muted text-center py-3">{{ _('No files attached to this page.') }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

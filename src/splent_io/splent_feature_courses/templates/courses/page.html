@@ -1,0 +1,41 @@
+{% extends "public_base.html" %}
+{% from "courses/_visibility.html" import withheld_badge %}
+
+{% block title %}{{ page.name }} · {{ course.name }} · {{ site.name }}{% endblock %}
+
+{% block hero %}
+    {{ render_block('hero', eyebrow=course.name, title=page.name,
+                    subtitle=page.category.name if page.category else '') }}
+{% endblock %}
+
+{% block content %}
+<div class="container section">
+
+    {% include "courses/_search.html" %}
+
+    <nav class="courses-breadcrumb" aria-label="{{ _('Breadcrumb') }}">
+        <a href="{{ course_url(course) }}">{{ course.name }}</a>
+        {% if page.category %}
+        <span aria-hidden="true">/</span>
+        <a href="{{ category_url(course, page.category) }}">{{ page.category.name }}</a>
+        {% endif %}
+    </nav>
+
+    <p class="card__meta">{{ withheld_badge(page) }}</p>
+
+    {# Already rendered and sanitised by the feature's markdown helper. #}
+    <article class="prose">{{ body_html }}</article>
+
+    {% if attachments %}
+    <section class="courses-attachments">
+        <h2 class="section-title">{{ _('Files') }}</h2>
+        <ul>
+            {% for attachment in attachments %}
+            <li><a href="{{ attachment.href }}">{{ attachment.label }}</a></li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}

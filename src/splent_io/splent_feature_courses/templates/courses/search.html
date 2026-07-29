@@ -1,0 +1,36 @@
+{% extends "public_base.html" %}
+{% from "courses/_visibility.html" import withheld_badge %}
+
+{% block title %}{{ _('Search') }} · {{ site.name }}{% endblock %}
+
+{% block hero %}
+    {{ render_block('hero', eyebrow=site.name, title=_('Search'),
+                    subtitle=target.name if target else _('All courses')) }}
+{% endblock %}
+
+{% block content %}
+<div class="container section">
+
+    {% include "courses/_search.html" %}
+
+    {% if not term %}
+    <p class="card__text">{{ _('Type something to search for.') }}</p>
+    {% elif not results %}
+    <p class="card__text">{{ _('Nothing matches %(term)s here.', term=term) }}</p>
+    {% else %}
+    <p class="card__meta">{{ _('%(count)s matching pages.', count=results|length) }}</p>
+    <ul class="courses-pages">
+        {% for page in results %}
+        <li>
+            <a href="{{ page_url(page.course, page) }}">{{ page.name }}</a>
+            <span class="card__meta">
+                {{ page.course.name }}{% if page.category %} · {{ page.category.name }}{% endif %}
+            </span>
+            {{ withheld_badge(page) }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+</div>
+{% endblock %}

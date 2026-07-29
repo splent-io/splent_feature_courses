@@ -1,0 +1,24 @@
+{# The search box, on every reading screen.
+
+   The scope travels with the form so a reader inside a course searches
+   that course first, which is what a question about the subject nearly
+   always means, and widens it without retyping the term. It is a GET
+   form because a result list is something people send each other. #}
+
+{% set current_course = course|default(none) %}
+{% set current_term = term|default('') %}
+{% set current_scope = scope|default('course' if current_course else 'newest') %}
+
+<form class="courses-search" method="get" action="{{ url_for('courses.search') }}" role="search">
+    <input type="search" name="q" value="{{ current_term }}"
+           placeholder="{{ _('Search the material') }}" aria-label="{{ _('Search the material') }}">
+    {% if current_course %}<input type="hidden" name="course" value="{{ current_course.slug }}">{% endif %}
+    <select name="scope" aria-label="{{ _('Where to search') }}">
+        {% if current_course %}
+        <option value="course" {{ 'selected' if current_scope == 'course' }}>{{ current_course.name }}</option>
+        {% endif %}
+        <option value="newest" {{ 'selected' if current_scope == 'newest' }}>{{ _('Latest course') }}</option>
+        <option value="all" {{ 'selected' if current_scope == 'all' }}>{{ _('All courses') }}</option>
+    </select>
+    <button class="btn btn-primary" type="submit">{{ _('Search') }}</button>
+</form>

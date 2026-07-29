@@ -1,0 +1,60 @@
+{# Field rendering shared by the three editing screens, so a course, a
+   category and a page present the same controls in the same order and
+   staff only have to learn them once. #}
+
+{% macro field(f) %}
+<div class="mb-3">
+    {{ f.label(class="form-label") }}
+    {{ f(class="form-control", **kwargs) }}
+    {% for error in f.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+</div>
+{% endmacro %}
+
+{% macro flashes() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' }} py-2">{{ message }}</div>
+    {% endfor %}
+{% endwith %}
+{% endmacro %}
+
+{% macro visibility(form) %}
+{% set timezone = config['COURSES_TIMEZONE'] %}
+{# The two controls, together, with the timezone spelled out. A date typed
+   in the wrong zone releases material early, and the field itself is the
+   only place that warning is any use. #}
+<fieldset class="mb-3">
+    <legend class="h6 text-muted">{{ _('Visibility') }}</legend>
+    <div class="form-check mb-3">
+        {{ form.hidden(class="form-check-input") }}
+        {{ form.hidden.label(class="form-check-label") }}
+        <div class="form-text">{{ _('Withheld from readers until you clear this, whatever the date below says.') }}</div>
+    </div>
+    <div class="mb-0">
+        {{ form.publish_at.label(class="form-label") }}
+        {{ form.publish_at(class="form-control") }}
+        <div class="form-text">{{ _('Local time in %(timezone)s. Leave it empty to release as soon as it is not hidden.', timezone=timezone) }}</div>
+        {% for error in form.publish_at.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+    </div>
+</fieldset>
+{% endmacro %}
+
+{% macro state_badge(item) %}
+{%- if item.is_released() -%}
+<span class="badge bg-success">{{ _('Visible') }}</span>
+{%- elif item.publish_at -%}
+<span class="badge bg-warning text-dark">{{ _('Withheld until %(moment)s', moment=item.publish_at|course_datetime) }}</span>
+{%- else -%}
+<span class="badge bg-secondary">{{ _('Withheld') }}</span>
+{%- endif -%}
+{% endmacro %}
+
+{% macro delete_button(action, form, question) %}
+<form method="POST" action="{{ action }}" class="d-inline"
+      onsubmit="return confirm('{{ question }}')">
+    {{ form.hidden_tag() }}
+    <button class="btn btn-sm btn-outline-danger" type="submit" title="{{ _('Remove') }}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+</form>
+{% endmacro %}

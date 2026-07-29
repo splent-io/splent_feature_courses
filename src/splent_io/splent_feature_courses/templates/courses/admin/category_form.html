@@ -1,0 +1,31 @@
+{% extends "base_template.html" %}
+{% from "courses/admin/_form.html" import field, flashes, visibility %}
+
+{% block title %}{{ category.name if category else _('New section') }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-start gap-2 mb-4">
+    <div>
+        <h1 class="h3 mb-0">{{ category.name if category else _('New section') }}</h1>
+        <p class="text-muted mb-0">{{ course.name }}</p>
+    </div>
+    <a href="{{ url_for('courses.admin_course_edit', course_id=course.id) }}" class="btn btn-outline-secondary">{{ _('Back to the course') }}</a>
+</div>
+
+{{ flashes() }}
+
+<form method="POST" class="card">
+    <div class="card-body">
+        {{ form.hidden_tag() }}
+        {{ field(form.name) }}
+        {{ field(form.position, type="number", min="0") }}
+        <div class="form-text mb-3">{{ _('Sections are ordered by hand, lowest first.') }}</div>
+        {{ visibility(form) }}
+        <p class="text-muted small mb-0">{{ _('Withholding a section withholds every page in it, whatever those pages say on their own.') }}</p>
+    </div>
+    <div class="card-footer text-end">
+        <a href="{{ url_for('courses.admin_course_edit', course_id=course.id) }}" class="btn btn-link text-muted">{{ _('Cancel') }}</a>
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+{% endblock %}

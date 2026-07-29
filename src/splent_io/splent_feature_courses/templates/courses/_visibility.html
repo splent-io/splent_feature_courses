@@ -1,0 +1,15 @@
+{# The mark on something a reader would not be shown at all.
+
+   Only staff ever reach a template holding a withheld item, so this
+   macro needs no role check of its own: for everyone else the listings
+   never contain one and the URL answers 404. #}
+
+{% macro withheld_badge(item) %}
+{%- if not item.is_released() -%}
+{%- if item.publish_at -%}
+<span class="badge" title="{{ _('Not visible to readers yet') }}">{{ _('Withheld until %(moment)s', moment=item.publish_at|course_datetime) }}</span>
+{%- else -%}
+<span class="badge" title="{{ _('Not visible to readers yet') }}">{{ _('Withheld') }}</span>
+{%- endif -%}
+{%- endif -%}
+{% endmacro %}

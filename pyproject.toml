@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=80.3.1", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "splent_feature_courses"
+version = "0.0.1"
+readme = "README.md"
+requires-python = ">=3.13"
+
+# Page bodies are markdown that was migrated out of an older wiki, so the
+# reader has to cope with GitHub-flavoured syntax and with the raw HTML
+# already sitting in those bodies. markdown-it-py reads both; nh3 cuts the
+# result down to an allowlist, because "written by staff" is not the same
+# as "safe to mark as trusted HTML" once the source is an import.
+dependencies = [
+    "markdown-it-py[linkify]>=3.0",
+    "mdit-py-plugins>=0.4",
+    "nh3>=0.2",
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["*.tests", "*.tests.*"]
+
+[tool.splent]
+cli_version = "1.15.0"
+
+# ── Feature Contract ──────────────────────────────────────────────────────────
+# Declares what this feature provides to and requires from the product.
+# Used by `splent feature:check` and `splent product:derive` for validation.
+[tool.splent.contract]
+description = "courses feature"
+
+[tool.splent.contract.provides]
+# Routes exposed by this feature
+routes = ["/courses"]
+# Blueprint names registered into Flask
+blueprints = ["courses_bp"]
+# SQLAlchemy models introduced by this feature
+models = []
+# CLI commands added by this feature
+commands = []
+
+[tool.splent.contract.requires]
+# Other SPLENT features this feature depends on (e.g. ["auth", "mail"])
+features = []
+# Environment variables this feature expects to be set
+env_vars = []
+
+# ── Extension points ──────────────────────────────────────────────────────────
+# Declares what other features can override or extend via refinement.
+# See: splent feature:xray
+[tool.splent.contract.extensible]
+services = []
+templates = []
+models = []
+hooks = []
+routes = false

@@ -1,0 +1,29 @@
+{% extends "public_base.html" %}
+{% from "courses/_visibility.html" import withheld_badge %}
+
+{% block title %}{{ _('Courses') }} · {{ site.name }}{% endblock %}
+
+{% block hero %}
+    {{ render_block('hero', eyebrow=site.name, title=_('Courses'),
+                    subtitle=_('Every academic year, newest first.')) }}
+{% endblock %}
+
+{% block content %}
+<div class="container section">
+
+    {% include "courses/_search.html" %}
+
+    <div class="card-grid">
+        {% for course in courses %}
+        <a class="card" href="{{ course_url(course) }}">
+            <h2 class="card__title">{{ course.name }}</h2>
+            <p class="card__meta">{{ withheld_badge(course) }}</p>
+            {% if course.description %}<p class="card__text">{{ course.description }}</p>{% endif %}
+        </a>
+        {% else %}
+        <p class="card__text">{{ _('There is nothing published here yet.') }}</p>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "public_base.html" %}
+{% from "courses/_visibility.html" import withheld_badge %}
+
+{% block title %}{{ course.name }} · {{ site.name }}{% endblock %}
+
+{% block hero %}
+    {{ render_block('hero', eyebrow=_('Course'), title=course.name,
+                    subtitle=course.description) }}
+{% endblock %}
+
+{% block content %}
+<div class="container section">
+
+    {% include "courses/_search.html" %}
+
+    <p class="card__meta">{{ withheld_badge(course) }}</p>
+
+    {% for category, pages in sections %}
+    <section class="courses-section">
+        <h2 class="section-title">
+            <a href="{{ category_url(course, category) }}">{{ category.name }}</a>
+            {{ withheld_badge(category) }}
+        </h2>
+        <ul class="courses-pages">
+            {% for page in pages %}
+            <li>
+                <a href="{{ page_url(course, page) }}">{{ page.name }}</a>
+                {{ withheld_badge(page) }}
+            </li>
+            {% else %}
+            <li class="card__text">{{ _('Nothing here yet.') }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% else %}
+    <p class="card__text">{{ _('This course has no material published yet.') }}</p>
+    {% endfor %}
+
+    {% if uncategorised %}
+    <section class="courses-section">
+        <h2 class="section-title">{{ _('Other material') }}</h2>
+        <ul class="courses-pages">
+            {% for page in uncategorised %}
+            <li>
+                <a href="{{ page_url(course, page) }}">{{ page.name }}</a>
+                {{ withheld_badge(page) }}
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+
+    <p><a href="{{ url_for('courses.index') }}">{{ _('All courses') }}</a></p>
+
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends "base_template.html" %}
+{% from "courses/admin/_form.html" import flashes, state_badge, delete_button %}
+
+{% block title %}{{ _('Courses') }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-start gap-2 mb-4">
+    <div>
+        <h1 class="h3 mb-0">{{ _('Courses') }}</h1>
+        <p class="text-muted mb-0">{{ _('One course per academic year. Each one is a snapshot: editing this year never changes what an earlier one shows.') }}</p>
+    </div>
+    <a href="{{ url_for('courses.admin_course_new') }}" class="btn btn-primary">{{ _('New course') }}</a>
+</div>
+
+{{ flashes() }}
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>{{ _('Course') }}</th>
+                    <th style="width:220px">{{ _('Readers see it') }}</th>
+                    <th style="width:320px" class="text-end">{{ _('Actions') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <td>
+                        <strong>{{ course.name }}</strong>
+                        <div class="text-muted small">{{ course_url(course) }}</div>
+                    </td>
+                    <td>{{ state_badge(course) }}</td>
+                    <td class="text-end">
+                        <a href="{{ course_url(course) }}" class="btn btn-sm btn-outline-secondary">{{ _('View') }}</a>
+                        <a href="{{ url_for('courses.admin_course_edit', course_id=course.id) }}" class="btn btn-sm btn-outline-primary">{{ _('Edit') }}</a>
+                        <button class="btn btn-sm btn-outline-secondary" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#copy-{{ course.id }}">{{ _('Copy') }}</button>
+                        {{ delete_button(url_for('courses.admin_course_delete', course_id=course.id), confirm_form,
+                                         _('Remove this course and everything in it?')) }}
+                    </td>
+                </tr>
+                <tr class="collapse" id="copy-{{ course.id }}">
+                    <td colspan="3">
+                        {# Copying is how next September starts: the pages that
+                           repeat come across, withheld, and last year's dates
+                           do not come with them. #}
+                        <form method="POST" action="{{ url_for('courses.admin_course_copy', course_id=course.id) }}"
+                              class="d-flex gap-2 align-items-start">
+                            {{ copy_form.hidden_tag() }}
+                            <div class="flex-grow-1">
+                                {# One form object renders every row, so the id
+                                   has to be made unique per course. #}
+                                {{ copy_form.name(class="form-control", id="copy-name-" ~ course.id,
+                                                  placeholder=_('Name of the new course')) }}
+                                <div class="form-text">{{ _('Everything is copied withheld, so nothing is released before you say so.') }}</div>
+                            </div>
+                            <button class="btn btn-primary" type="submit">{{ _('Copy course') }}</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="text-muted text-center py-4">{{ _('No courses yet.') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

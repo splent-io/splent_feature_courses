@@ -1,0 +1,410 @@
+/* Course wiki styles.
+ *
+ * Every colour, face and radius comes from the theme's --brand-* custom
+ * properties, so a skin recolours all of this by publishing tokens and
+ * nothing here has to know which subject it is serving. The skin loads
+ * after this file (asset order 200 against 100) and can override any rule.
+ *
+ * The one thing this file does decide is the reading experience, because
+ * that is not a matter of branding: a course wiki is read as documentation,
+ * in long stretches, often on a phone in a lab. */
+
+/* ── Course listing ──────────────────────────────────────────────────── */
+
+.courses-index__intro {
+    color: var(--brand-muted);
+    margin-bottom: 1.5rem;
+}
+
+.courses-list {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+}
+
+.courses-card {
+    background: var(--brand-surface);
+    border: 1px solid var(--brand-border);
+    border-radius: var(--brand-radius);
+    padding: 1.1rem 1.2rem;
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    /* Restrained on purpose: a list of academic years is navigation, not a
+     * shop window. */
+    transition: border-color .15s ease, transform .15s ease;
+}
+
+.courses-card:hover,
+.courses-card:focus-visible {
+    border-color: var(--brand-primary);
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.courses-card__name {
+    font-family: var(--brand-font-heading);
+    color: var(--brand-heading);
+    font-size: 1.15rem;
+    margin: 0 0 .35rem;
+}
+
+.courses-card__meta {
+    color: var(--brand-muted);
+    font-size: .875rem;
+    margin: 0;
+}
+
+/* ── Breadcrumbs ─────────────────────────────────────────────────────── */
+
+.courses-breadcrumb {
+    font-size: .875rem;
+    color: var(--brand-muted);
+    margin-bottom: 1rem;
+    /* Wraps rather than scrolls: three levels of Spanish titles do not fit
+     * on a narrow screen and a hidden trail is a lost reader. */
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+}
+
+.courses-breadcrumb a {
+    color: var(--brand-muted);
+}
+
+.courses-breadcrumb a:hover {
+    color: var(--brand-primary);
+}
+
+.courses-breadcrumb li + li::before {
+    content: "/";
+    margin-right: .35rem;
+    color: var(--brand-border);
+}
+
+/* ── Categories and their pages ──────────────────────────────────────── */
+
+.courses-section {
+    margin-bottom: 2.25rem;
+}
+
+.courses-section__title {
+    font-family: var(--brand-font-heading);
+    color: var(--brand-heading);
+    font-size: 1.3rem;
+    margin: 0 0 .25rem;
+    padding-bottom: .4rem;
+    border-bottom: 2px solid var(--brand-border);
+}
+
+.courses-section__title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.courses-pages {
+    list-style: none;
+    padding: 0;
+    margin: .75rem 0 0;
+}
+
+.courses-pages li {
+    border-bottom: 1px solid var(--brand-border);
+}
+
+.courses-pages li:last-child {
+    border-bottom: 0;
+}
+
+.courses-pages a {
+    display: block;
+    /* A comfortable target for a finger, which is how a lab script gets
+     * opened five minutes before the session. */
+    padding: .6rem .25rem;
+    color: var(--brand-text);
+    text-decoration: none;
+}
+
+.courses-pages a:hover {
+    color: var(--brand-primary);
+    background: var(--brand-surface);
+}
+
+.courses-empty {
+    color: var(--brand-muted);
+    font-style: italic;
+    padding: .75rem 0;
+}
+
+/* ── The Withheld badge ──────────────────────────────────────────────── */
+
+/* Staff only: readers never receive a withheld item. It has to be obvious
+ * at a glance without shouting, because staff see it constantly while a
+ * course is being prepared. */
+.courses-badge {
+    display: inline-block;
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+    padding: .12rem .45rem;
+    border-radius: var(--brand-radius);
+    border: 1px dashed var(--brand-muted);
+    color: var(--brand-muted);
+    background: transparent;
+    margin-left: .5rem;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.courses-badge--scheduled {
+    border-style: solid;
+    border-color: var(--brand-accent);
+    color: var(--brand-accent);
+}
+
+/* ── Search ──────────────────────────────────────────────────────────── */
+
+.courses-search {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.courses-search input[type="search"],
+.courses-search input[type="text"] {
+    flex: 1 1 14rem;
+    min-width: 0;
+    padding: .5rem .7rem;
+    border: 1px solid var(--brand-border);
+    border-radius: var(--brand-radius);
+    background: var(--brand-bg);
+    color: var(--brand-text);
+    font-family: inherit;
+}
+
+.courses-search select {
+    padding: .5rem .6rem;
+    border: 1px solid var(--brand-border);
+    border-radius: var(--brand-radius);
+    background: var(--brand-surface);
+    color: var(--brand-text);
+}
+
+.courses-search__hint {
+    flex: 1 1 100%;
+    color: var(--brand-muted);
+    font-size: .85rem;
+}
+
+.courses-results {
+    list-style: none;
+    padding: 0;
+}
+
+.courses-results li {
+    padding: .75rem 0;
+    border-bottom: 1px solid var(--brand-border);
+}
+
+.courses-results__where {
+    display: block;
+    color: var(--brand-muted);
+    font-size: .8rem;
+}
+
+/* ── Attachments ─────────────────────────────────────────────────────── */
+
+/* The files are the material, so they are a first-class block on the page
+ * rather than a line of links at the bottom. */
+.courses-attachments {
+    margin-top: 2rem;
+    border: 1px solid var(--brand-border);
+    border-radius: var(--brand-radius);
+    background: var(--brand-surface);
+    padding: 1rem 1.1rem;
+}
+
+.courses-attachments__title {
+    font-family: var(--brand-font-heading);
+    color: var(--brand-heading);
+    font-size: 1rem;
+    margin: 0 0 .6rem;
+}
+
+.courses-attachments ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.courses-attachments li + li {
+    margin-top: .4rem;
+}
+
+.courses-attachments a {
+    color: var(--brand-primary);
+    text-decoration: none;
+    word-break: break-word;
+}
+
+.courses-attachments a:hover {
+    text-decoration: underline;
+}
+
+/* ── The page body ───────────────────────────────────────────────────── */
+
+/* .prose was previously defined only in the blog feature's stylesheet,
+ * which a course wiki does not install, so the typography of every
+ * migrated page depends on this block. */
+.prose {
+    /* Around 70 characters, the measure long technical prose is read at
+     * without the eye losing the line. */
+    max-width: 42rem;
+    color: var(--brand-text);
+    font-family: var(--brand-font-body);
+    font-size: 1.02rem;
+    line-height: 1.7;
+}
+
+.prose > * + * {
+    margin-top: 1.1em;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+    font-family: var(--brand-font-heading);
+    color: var(--brand-heading);
+    line-height: 1.25;
+    margin-top: 2em;
+    margin-bottom: .6em;
+}
+
+.prose h1 { font-size: 1.8rem; }
+.prose h2 {
+    font-size: 1.4rem;
+    padding-bottom: .25rem;
+    border-bottom: 1px solid var(--brand-border);
+}
+.prose h3 { font-size: 1.15rem; }
+.prose h4 { font-size: 1rem; }
+
+.prose a {
+    color: var(--brand-primary);
+    text-decoration: underline;
+    text-underline-offset: .15em;
+}
+
+.prose ul,
+.prose ol {
+    padding-left: 1.4rem;
+}
+
+.prose li + li {
+    margin-top: .3em;
+}
+
+.prose blockquote {
+    margin-left: 0;
+    padding: .1rem 0 .1rem 1rem;
+    border-left: 3px solid var(--brand-border);
+    color: var(--brand-muted);
+}
+
+.prose img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--brand-radius);
+}
+
+.prose hr {
+    border: 0;
+    border-top: 1px solid var(--brand-border);
+}
+
+/* Code. A course on software engineering is mostly commands and snippets,
+ * so this is not a detail. */
+.prose code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .9em;
+    padding: .12em .35em;
+    border-radius: 4px;
+    background: var(--brand-surface);
+    color: var(--brand-accent);
+    word-break: break-word;
+}
+
+.prose pre {
+    background: var(--brand-surface);
+    border: 1px solid var(--brand-border);
+    border-left: 3px solid var(--brand-primary);
+    border-radius: var(--brand-radius);
+    padding: .9rem 1rem;
+    /* Long command lines scroll inside the block instead of widening the
+     * page, which would break every phone. */
+    overflow-x: auto;
+}
+
+.prose pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    font-size: .875rem;
+    line-height: 1.55;
+    word-break: normal;
+}
+
+/* Tables. The migrated material has plenty, and some are wide. */
+.prose table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .95rem;
+    display: block;
+    overflow-x: auto;
+}
+
+.prose th,
+.prose td {
+    border: 1px solid var(--brand-border);
+    padding: .45rem .6rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+.prose th {
+    background: var(--brand-surface);
+    color: var(--brand-heading);
+    font-family: var(--brand-font-heading);
+}
+
+/* Anchors the markdown renderer adds to headings, revealed on hover so
+ * they do not clutter the reading view. */
+.prose .header-anchor {
+    opacity: 0;
+    margin-left: .35rem;
+    text-decoration: none;
+}
+
+.prose h1:hover .header-anchor,
+.prose h2:hover .header-anchor,
+.prose h3:hover .header-anchor,
+.prose h4:hover .header-anchor,
+.prose .header-anchor:focus-visible {
+    opacity: .5;
+}
+
+/* Task lists, which the renderer emits with checkboxes. */
+.prose input[type="checkbox"] {
+    margin-right: .4rem;
+}
+
+.prose ul.contains-task-list {
+    list-style: none;
+    padding-left: .2rem;
+}

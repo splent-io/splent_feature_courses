@@ -53,3 +53,41 @@ def courses_admin_link():
 
 
 register_template_hook("layout.authenticated_sidebar", courses_admin_link)
+
+
+# ── The editor, on the screens that have one ─────────────────────────────
+#
+# The authenticated shell does not render the asset registry; only the
+# theme's public layout does. So the editor reaches the back office through
+# these two hooks instead, and only on the page editor: loading a markdown
+# editor on a list of courses would be three hundred kilobytes for nothing.
+
+EDITOR_ENDPOINTS = ("courses.admin_page_new", "courses.admin_page_edit")
+
+
+def _on_editor_screen() -> bool:
+    return (request.endpoint or "") in EDITOR_ENDPOINTS
+
+
+def courses_editor_css():
+    if not _on_editor_screen():
+        return ""
+    vendor = url_for("courses.assets", subfolder="vendor", filename="easymde.min.css")
+    own = url_for("courses.assets", subfolder="css", filename="courses_editor.css")
+    return (
+        f'<link rel="stylesheet" href="{vendor}"><link rel="stylesheet" href="{own}">'
+    )
+
+
+def courses_editor_js():
+    if not _on_editor_screen():
+        return ""
+    vendor = url_for("courses.assets", subfolder="vendor", filename="easymde.min.js")
+    own = url_for("courses.assets", subfolder="js", filename="courses_editor.js")
+    # The vendored library first, then the initialiser, and neither
+    # deferred: the initialiser checks readyState itself.
+    return f'<script src="{vendor}"></script><script src="{own}"></script>'
+
+
+register_template_hook("layout.head.css", courses_editor_css)
+register_template_hook("layout.scripts", courses_editor_js)

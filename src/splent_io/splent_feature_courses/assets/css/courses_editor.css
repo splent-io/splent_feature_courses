@@ -1,0 +1,143 @@
+/* The editor's toolbar, labelled with words.
+ *
+ * EasyMDE draws its buttons with FontAwesome classes, and this product does
+ * not install FontAwesome, so the buttons would render blank. Rather than
+ * pull in an icon font and its webfonts for seventeen glyphs, each button
+ * gets a short label. It is also plainer to learn than a row of icons for
+ * staff who write course material a few times a term.
+ *
+ * Colours come from the theme's tokens, so a skin restyles the editor with
+ * everything else.
+ */
+
+.EasyMDEContainer .editor-toolbar {
+    border: 1px solid var(--brand-border);
+    border-bottom: 0;
+    border-radius: var(--brand-radius) var(--brand-radius) 0 0;
+    background: var(--brand-surface);
+    padding: .35rem .4rem;
+    opacity: 1;
+}
+
+.EasyMDEContainer .editor-toolbar button {
+    /* Wide enough for a word, and the icon element is empty anyway. */
+    width: auto;
+    min-width: 0;
+    height: auto;
+    padding: .25rem .55rem;
+    margin: .1rem .05rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--brand-text);
+    font-family: var(--brand-font-body);
+    font-size: .8rem;
+    line-height: 1.4;
+}
+
+.EasyMDEContainer .editor-toolbar button:hover,
+.EasyMDEContainer .editor-toolbar button.active {
+    background: var(--brand-bg);
+    border-color: var(--brand-border);
+    color: var(--brand-primary);
+}
+
+.EasyMDEContainer .editor-toolbar i.separator {
+    border-left: 1px solid var(--brand-border);
+    border-right: 0;
+    margin: 0 .3rem;
+}
+
+/* The label. EasyMDE puts the fa classes on the button itself. */
+.EasyMDEContainer .editor-toolbar button::before {
+    font-family: var(--brand-font-body);
+    font-weight: 500;
+}
+
+.EasyMDEContainer .editor-toolbar button.bold::before { content: "Negrita"; }
+.EasyMDEContainer .editor-toolbar button.italic::before { content: "Cursiva"; }
+.EasyMDEContainer .editor-toolbar button.heading::before { content: "Título"; }
+.EasyMDEContainer .editor-toolbar button.code::before { content: "Código"; }
+.EasyMDEContainer .editor-toolbar button.quote::before { content: "Cita"; }
+.EasyMDEContainer .editor-toolbar button.unordered-list::before { content: "Lista"; }
+.EasyMDEContainer .editor-toolbar button.ordered-list::before { content: "Numerada"; }
+.EasyMDEContainer .editor-toolbar button.table::before { content: "Tabla"; }
+.EasyMDEContainer .editor-toolbar button.link::before { content: "Enlace"; }
+.EasyMDEContainer .editor-toolbar button.image::before { content: "Imagen"; }
+.EasyMDEContainer .editor-toolbar button.preview::before { content: "Vista previa"; }
+.EasyMDEContainer .editor-toolbar button.side-by-side::before { content: "Lado a lado"; }
+.EasyMDEContainer .editor-toolbar button.fullscreen::before { content: "Pantalla completa"; }
+.EasyMDEContainer .editor-toolbar button.guide::before { content: "Ayuda"; }
+
+/* The empty icon element the button wraps. */
+.EasyMDEContainer .editor-toolbar button i.fa {
+    display: none;
+}
+
+/* The writing surface. */
+.EasyMDEContainer .CodeMirror {
+    border: 1px solid var(--brand-border);
+    border-radius: 0 0 var(--brand-radius) var(--brand-radius);
+    background: var(--brand-bg);
+    color: var(--brand-text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .95rem;
+    line-height: 1.6;
+    padding: .4rem .2rem;
+}
+
+.EasyMDEContainer .CodeMirror-cursor {
+    border-left-color: var(--brand-primary);
+}
+
+.EasyMDEContainer .cm-s-easymde .cm-header {
+    color: var(--brand-heading);
+}
+
+.EasyMDEContainer .cm-s-easymde .cm-link,
+.EasyMDEContainer .cm-s-easymde .cm-url {
+    color: var(--brand-primary);
+}
+
+.EasyMDEContainer .cm-s-easymde .cm-comment {
+    background: var(--brand-surface);
+    color: var(--brand-accent);
+}
+
+.EasyMDEContainer .editor-statusbar {
+    color: var(--brand-muted);
+    font-size: .78rem;
+    padding: .3rem .2rem 0;
+}
+
+/* The editor's own preview, which mirrors the published page. The server
+ * remains the renderer of record, so this is a convenience and is styled
+ * to match rather than to replace it. */
+.EasyMDEContainer .editor-preview,
+.EasyMDEContainer .editor-preview-side {
+    background: var(--brand-bg);
+    color: var(--brand-text);
+    font-family: var(--brand-font-body);
+    line-height: 1.7;
+    padding: 1rem 1.2rem;
+}
+
+.EasyMDEContainer .editor-preview-side {
+    border: 1px solid var(--brand-border);
+}
+
+.EasyMDEContainer .editor-preview h1,
+.EasyMDEContainer .editor-preview h2,
+.EasyMDEContainer .editor-preview-side h1,
+.EasyMDEContainer .editor-preview-side h2 {
+    font-family: var(--brand-font-heading);
+    color: var(--brand-heading);
+}
+
+.EasyMDEContainer .editor-preview pre,
+.EasyMDEContainer .editor-preview-side pre {
+    background: var(--brand-surface);
+    border-left: 3px solid var(--brand-primary);
+    border-radius: var(--brand-radius);
+    padding: .8rem 1rem;
+    overflow-x: auto;
+}

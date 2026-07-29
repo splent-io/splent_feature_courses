@@ -30,7 +30,10 @@
         <div class="row g-3">
             <div class="col-lg-{{ '6' if preview_html is not none else '12' }}">
                 {{ form.body_md.label(class="form-label") }}
-                {{ form.body_md(class="form-control font-monospace", rows=24) }}
+                {# The editor attaches to this attribute and writes back into
+                   the field, so the form posts markdown either way and the
+                   page stays editable if the script does not load. #}
+                {{ form.body_md(class="form-control font-monospace", rows=24, **{"data-courses-editor": "1"}) }}
                 <div class="form-text">{{ _('Markdown. Tables, footnotes and existing HTML are all kept.') }}</div>
                 {% for error in form.body_md.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
             </div>

@@ -18,7 +18,23 @@ def _may_read(item, user) -> bool:
 
 
 def init_feature(app):
+    from splent_framework.assets.asset_registry import register_asset
+
     register_service(app, "CoursesService", CoursesService)
+
+    # Order 100, so a skin at 200 cascades after it and recolours
+    # everything. This file carries no colour of its own; it reads the
+    # theme's tokens.
+    register_asset(
+        "css", "courses.assets", order=100, subfolder="css", filename="courses.css"
+    )
+
+    # The editor is NOT registered here. The asset registry feeds the
+    # theme's public layout, and the editor belongs to the back office,
+    # which the authenticated shell renders instead. hooks.py loads it
+    # through layout.head.css and layout.scripts, and only on the two
+    # screens that have a body to write, because a markdown editor on a
+    # list of courses is three hundred kilobytes for nothing.
 
     # Attachments are stored as restricted media, whose bytes are refused
     # unless the feature owning them allows the read. A lab script

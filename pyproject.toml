@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "splent_feature_courses"
-version = "0.2.0"
+version = "0.3.0"
 readme = "README.md"
 requires-python = ">=3.13"
 
@@ -50,7 +50,7 @@ commands   = ["copy-course", "hide", "import-bookstack", "new-course", "publish"
 hooks      = ["layout.authenticated_sidebar", "layout.head.css", "layout.scripts"]
 services   = ["CoursesService"]
 signals    = []
-translations = []
+translations = ["es"]
 docker     = []
 
 [tool.splent.contract.requires]
@@ -60,7 +60,7 @@ signals  = []
 
 [tool.splent.contract.extensible]
 services  = ["CoursesService"]
-templates = ["courses/admin/category_form.html", "courses/admin/course_form.html", "courses/admin/courses.html", "courses/admin/page_form.html", "courses/category.html", "courses/course.html", "courses/hooks/admin_sidebar.html", "courses/index.html", "courses/page.html", "courses/search.html"]
+templates = ["courses/admin/category_form.html", "courses/admin/course_form.html", "courses/admin/courses.html", "courses/admin/page_form.html", "courses/category.html", "courses/course.html", "courses/hooks/admin_sidebar.html", "courses/index.html", "courses/page.html"]
 models    = ["Category", "Course", "Page", "PageAttachment"]
 hooks     = ["layout.authenticated_sidebar", "layout.head.css", "layout.scripts"]
 routes    = false

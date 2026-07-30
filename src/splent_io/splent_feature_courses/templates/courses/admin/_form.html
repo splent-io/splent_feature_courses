@@ -39,11 +39,25 @@
 </fieldset>
 {% endmacro %}
 
+{# The badge asks the service, not the row.
+
+   It used to ask item.is_released(), which reads the item's own two columns
+   and nothing else, and it lied in both directions: a page inside a withheld
+   course showed as Visible while readers got a 404, and a hidden item with a
+   date announced a release that was never going to arrive.
+
+   Four states now, because "withheld" was hiding two different situations
+   and a teacher needs to know which screen to go and fix. #}
 {% macro state_badge(item) %}
-{%- if item.is_released() -%}
+{%- set status = visibility_state(item) -%}
+{%- if status.state == 'visible' -%}
 <span class="badge bg-success">{{ _('Visible') }}</span>
-{%- elif item.publish_at -%}
-<span class="badge bg-warning text-dark">{{ _('Withheld until %(moment)s', moment=item.publish_at|course_datetime) }}</span>
+{%- elif status.state == 'scheduled' -%}
+<span class="badge bg-warning text-dark">{{ _('Withheld until %(moment)s', moment=status.moment|course_datetime) }}</span>
+{%- elif status.state == 'blocked' -%}
+{# Released in itself, and still unreachable. Naming what is holding it is
+   the whole value of this state. #}
+<span class="badge bg-warning text-dark">{{ _('Held back by %(name)s', name=status.blocked_by.name) }}</span>
 {%- else -%}
 <span class="badge bg-secondary">{{ _('Withheld') }}</span>
 {%- endif -%}

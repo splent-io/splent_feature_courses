@@ -96,9 +96,22 @@ def page_url(course, page) -> str:
     return f"/{path}/{course.slug}/{segment}/{page.slug}"
 
 
+def _visibility_state(item):
+    """What a reader would experience, for the admin badge.
+
+    Through the service, because it is the same question the public routes
+    ask and two places deciding what "visible" means is how the badge came
+    to disagree with the pages.
+    """
+    from splent_framework.services.service_locator import service_proxy
+
+    return service_proxy("CoursesService").visibility_state(item)
+
+
 def inject_context_vars(app):
     return {
         "course_url": course_url,
         "category_url": category_url,
         "page_url": page_url,
+        "visibility_state": _visibility_state,
     }

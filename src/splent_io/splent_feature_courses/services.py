@@ -168,6 +168,60 @@ class CoursesService(BaseService):
         return recent
 
 
+    def visibility_state(self, item, now=None) -> dict:
+        """What a reader would actually experience, for the admin badge.
+
+        The badge used to ask ``item.is_released()``, which reads the item's
+        own two columns and nothing else, and it lied in both directions.
+
+        Upwards: a page or a section inside a withheld course was shown as
+        Visible while every reader got a 404. A teacher checking that this
+        week's material is out reads that badge and stops looking.
+
+        Downwards: with ``hidden`` ticked and a date set, it announced
+        "withheld until 1 September", a date that will never arrive, because
+        ``hidden`` wins over the schedule for good. Somebody waits for a
+        release that is not coming.
+
+        Answered here rather than in the template because it is the same
+        question the public routes ask, and two places deciding what
+        "visible" means is how they came to disagree.
+
+        Returns ``{"state": ..., "moment": ..., "blocked_by": ...}`` with
+        state in {visible, hidden, scheduled, blocked}.
+        """
+        now = now or _utcnow()
+
+        if getattr(item, "hidden", False):
+            # No moment, whatever the date column says.
+            return {"state": "hidden", "moment": None, "blocked_by": None}
+
+        publish_at = getattr(item, "publish_at", None)
+        if publish_at is not None and not item.is_released(now):
+            return {"state": "scheduled", "moment": publish_at, "blocked_by": None}
+
+        # Its own controls are clear. Now the question a reader asks: does
+        # the branch above it let this through?
+        blocker = self._withholding_ancestor(item, now)
+        if blocker is not None:
+            return {"state": "blocked", "moment": None, "blocked_by": blocker}
+
+        return {"state": "visible", "moment": None, "blocked_by": None}
+
+    def _withholding_ancestor(self, item, now):
+        """The nearest thing above this one that is keeping it from readers.
+
+        Nearest rather than any: telling somebody the course is withheld
+        when the section is too sends them to the wrong screen.
+        """
+        category = getattr(item, "category", None)
+        if category is not None and not category.is_released(now):
+            return category
+        course = getattr(item, "course", None)
+        if course is not None and not course.is_released(now):
+            return course
+        return None
+
     # ── History ──────────────────────────────────────────────────────────
     #
     # One place decides what gets archived, and it is this one. A revision

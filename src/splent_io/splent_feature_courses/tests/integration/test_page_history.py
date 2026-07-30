@@ -192,3 +192,108 @@ class TestOneHistoryPerPage:
 
             assert service.revisions.get_for_page(page, revision.id) is not None
             assert service.revisions.get_for_page(page + 999, revision.id) is None
+
+
+class TestTheVisibilityBadgeTellsTheTruth:
+    """It used to ask the row, and lied in both directions.
+
+    Upwards: a page inside a withheld course showed as Visible while every
+    reader got a 404, so a teacher checking that this week's material is out
+    read that badge and stopped looking. Downwards: with hidden ticked and a
+    date set it announced a release that was never going to arrive, because
+    hidden wins over the schedule for good.
+    """
+
+    def test_a_page_nobody_is_withholding_is_visible(self, test_app, service, page):
+        with test_app.app_context():
+            item = db.session.get(Page, page)
+            assert service.visibility_state(item)["state"] == "visible"
+
+    def test_hidden_never_announces_a_date(self, test_app, service, page):
+        from datetime import datetime, timedelta, timezone
+
+        with test_app.app_context():
+            item = db.session.get(Page, page)
+            item.hidden = True
+            item.publish_at = datetime.now(timezone.utc) + timedelta(days=30)
+            db.session.commit()
+
+            status = service.visibility_state(db.session.get(Page, page))
+            assert status["state"] == "hidden"
+            # The date is real in the column and meaningless in fact, so it
+            # must not reach the screen.
+            assert status["moment"] is None
+
+    def test_a_future_date_without_hidden_is_a_schedule(self, test_app, service, page):
+        from datetime import datetime, timedelta, timezone
+
+        with test_app.app_context():
+            item = db.session.get(Page, page)
+            item.publish_at = datetime.now(timezone.utc) + timedelta(days=2)
+            db.session.commit()
+
+            status = service.visibility_state(db.session.get(Page, page))
+            assert status["state"] == "scheduled"
+            assert status["moment"] is not None
+
+    def test_a_released_page_inside_a_withheld_course_is_not_visible(
+        self, test_app, service, page
+    ):
+        """The lie that mattered: readers get a 404 and the badge said
+        Visible."""
+        with test_app.app_context():
+            item = db.session.get(Page, page)
+            item.course.hidden = True
+            db.session.commit()
+
+            status = service.visibility_state(db.session.get(Page, page))
+            assert status["state"] == "blocked"
+            # Named, because a teacher has to know which screen to go and fix.
+            assert status["blocked_by"].name == "ISIA 2027/2028"
+
+    def test_it_names_the_nearest_thing_holding_it(self, test_app, service, page):
+        """Saying the course is withheld when the section is too sends
+        somebody to the wrong screen."""
+        from splent_io.splent_feature_courses.models import Category
+
+        with test_app.app_context():
+            item = db.session.get(Page, page)
+            category = Category(
+                course_id=item.course_id,
+                name="Prácticas",
+                slug="practicas",
+                hidden=True,
+            )
+            db.session.add(category)
+            db.session.flush()
+            item.category_id = category.id
+            item.course.hidden = True
+            db.session.commit()
+
+            status = service.visibility_state(db.session.get(Page, page))
+            assert status["blocked_by"].name == "Prácticas"
+
+    def test_the_badge_agrees_with_what_a_reader_gets(self, test_app, service, page):
+        """The property underneath all of the above: whenever the badge says
+        visible, an anonymous reader can read it, and never otherwise."""
+        from datetime import datetime, timedelta, timezone
+
+        cases = [
+            {},
+            {"hidden": True},
+            {"publish_at": datetime.now(timezone.utc) + timedelta(days=1)},
+            {"publish_at": datetime.now(timezone.utc) - timedelta(days=1)},
+        ]
+        for fields in cases:
+            with test_app.app_context():
+                item = db.session.get(Page, page)
+                item.hidden = False
+                item.publish_at = None
+                for key, value in fields.items():
+                    setattr(item, key, value)
+                db.session.commit()
+
+                item = db.session.get(Page, page)
+                says_visible = service.visibility_state(item)["state"] == "visible"
+                reader_sees = service.page_visible(item, user=None)
+                assert says_visible == reader_sees, fields

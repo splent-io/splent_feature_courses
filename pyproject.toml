@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "splent_feature_courses"
-version = "0.4.0"
+version = "0.5.0"
 readme = "README.md"
 requires-python = ">=3.13"
 
@@ -55,6 +55,7 @@ docker     = []
 
 [tool.splent.contract.requires]
 features = ["auth", "media"]
+features_optional = ["settings"]
 env_vars = ["COURSES_CATEGORY_SEGMENT", "COURSES_DEFAULT_CATEGORIES", "COURSES_DESCRIPTION_TEMPLATE", "COURSES_NAME_PREFIX", "COURSES_PAGE_SEGMENT", "COURSES_PATH", "COURSES_TIMEZONE"]
 signals  = []
 

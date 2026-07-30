@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-30 15:44+0000\n"
+"POT-Creation-Date: 2026-07-30 17:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Generated-By: Babel 2.18.0\n"
 
 #: src/splent_io/splent_feature_courses/hooks.py:49
-#: src/splent_io/splent_feature_courses/routes.py:250
+#: src/splent_io/splent_feature_courses/routes.py:188
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:4
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:9
 #: src/splent_io/splent_feature_courses/templates/courses/hooks/admin_sidebar.html:5
@@ -27,61 +27,69 @@ msgstr ""
 msgid "Courses"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:232
+#: src/splent_io/splent_feature_courses/routes.py:170
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:73
 msgid "Attachment"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:443
+#: src/splent_io/splent_feature_courses/routes.py:388
 msgid "No category"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:500
+#: src/splent_io/splent_feature_courses/routes.py:445
 #, python-format
 msgid "Created %(name)s."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:524
-#: src/splent_io/splent_feature_courses/routes.py:619
-#: src/splent_io/splent_feature_courses/routes.py:706
+#: src/splent_io/splent_feature_courses/routes.py:469
+#: src/splent_io/splent_feature_courses/routes.py:564
+#: src/splent_io/splent_feature_courses/routes.py:651
 #, python-format
 msgid "Saved %(name)s."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:551
+#: src/splent_io/splent_feature_courses/routes.py:496
 msgid "A name is required to copy a course."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:558
+#: src/splent_io/splent_feature_courses/routes.py:503
 #, python-format
 msgid "Copied into %(name)s."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:570
-#: src/splent_io/splent_feature_courses/routes.py:642
-#: src/splent_io/splent_feature_courses/routes.py:750
-#: src/splent_io/splent_feature_courses/routes.py:762
+#: src/splent_io/splent_feature_courses/routes.py:515
+#: src/splent_io/splent_feature_courses/routes.py:587
+#: src/splent_io/splent_feature_courses/routes.py:695
+#: src/splent_io/splent_feature_courses/routes.py:707
 #, python-format
 msgid "Removed %(name)s."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:594
-#: src/splent_io/splent_feature_courses/routes.py:675
+#: src/splent_io/splent_feature_courses/routes.py:539
+#: src/splent_io/splent_feature_courses/routes.py:620
 #, python-format
 msgid "Added %(name)s."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:724
+#: src/splent_io/splent_feature_courses/routes.py:669
 msgid "Choose a file to upload."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:731
+#: src/splent_io/splent_feature_courses/routes.py:676
 msgid "That file could not be stored."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:733
+#: src/splent_io/splent_feature_courses/routes.py:678
 #, python-format
 msgid "Attached %(name)s."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/_course_aside.html:19
+msgid "Contents of this course"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/_course_aside.html:56
+msgid "Recently added"
 msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:10
@@ -135,12 +143,8 @@ msgstr ""
 msgid "There is nothing published here yet."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/page.html:15
-msgid "Breadcrumb"
-msgstr ""
-
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:65
-#: src/splent_io/splent_feature_courses/templates/courses/page.html:30
+#: src/splent_io/splent_feature_courses/templates/courses/page.html:29
 msgid "Files"
 msgstr ""
 

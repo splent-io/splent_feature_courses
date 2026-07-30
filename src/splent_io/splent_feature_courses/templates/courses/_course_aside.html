@@ -1,0 +1,71 @@
+{# The rest of the course, beside the page being read.
+
+   A lab script is read end to end and then leaves the reader with nowhere
+   to go but the back button. These two put the course back within reach
+   without taking the page's own width away from it: everything the course
+   holds, and what has moved lately.
+
+   Both are always about the course the current page belongs to, which is
+   the only course a reader standing here is thinking about.
+
+   Nothing here decides visibility. What arrives has already been through
+   the same per-reader check the pages themselves go through, so a section
+   released next Monday is not announced by name in a navigation panel. #}
+
+<aside class="course-aside" aria-labelledby="course-aside-title">
+
+    <nav class="course-aside__block" aria-labelledby="course-aside-title">
+        <h2 class="course-aside__title" id="course-aside-title">
+            {{ _('Contents of this course') }}
+        </h2>
+
+        {% for category, pages in sections %}
+        <div class="course-aside__section">
+            <a class="course-aside__section-name"
+               href="{{ category_url(course, category) }}">{{ category.name }}</a>
+            {% if pages %}
+            <ul class="course-aside__list">
+                {% for entry in pages %}
+                {# aria-current, not a class alone: the page a reader is on is
+                   a fact about the document, not a colour. #}
+                <li><a class="course-aside__link{{ ' is-current' if entry.id == page.id else '' }}"
+                       href="{{ page_url(course, entry) }}"
+                       {% if entry.id == page.id %}aria-current="page"{% endif %}>{{ entry.name }}</a></li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        {% if uncategorised %}
+        <div class="course-aside__section">
+            <ul class="course-aside__list">
+                {% for entry in uncategorised %}
+                <li><a class="course-aside__link{{ ' is-current' if entry.id == page.id else '' }}"
+                       href="{{ page_url(course, entry) }}"
+                       {% if entry.id == page.id %}aria-current="page"{% endif %}>{{ entry.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </nav>
+
+    {% if recent %}
+    <nav class="course-aside__block" aria-labelledby="course-aside-recent">
+        <h2 class="course-aside__title" id="course-aside-recent">
+            {{ _('Recently added') }}
+        </h2>
+        <ul class="course-aside__list course-aside__list--recent">
+            {% for entry in recent %}
+            <li>
+                <a class="course-aside__link" href="{{ page_url(course, entry) }}">{{ entry.name }}</a>
+                {% if entry.category %}
+                <span class="course-aside__where">{{ entry.category.name }}</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </nav>
+    {% endif %}
+
+</aside>

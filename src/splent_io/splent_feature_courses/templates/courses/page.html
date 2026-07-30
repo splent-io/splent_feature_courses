@@ -9,7 +9,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="container section">
+<div class="container section course-layout">
+
+<div class="course-layout__main">
 
 
     {# No trail here. The shell draws one, from the breadcrumb this view
@@ -32,6 +34,10 @@
         </ul>
     </section>
     {% endif %}
+
+</div>
+
+{% include "courses/_course_aside.html" %}
 
 </div>
 {% endblock %}

@@ -11,6 +11,7 @@ from splent_io.splent_feature_courses.models import (
     PageAttachment,
 )
 from splent_framework.repositories.BaseRepository import BaseRepository
+from sqlalchemy import func
 
 
 class CourseRepository(BaseRepository):
@@ -77,6 +78,31 @@ class PageRepository(BaseRepository):
         return (
             Page.query.filter_by(course_id=course_id)
             .order_by(Page.position, Page.id)
+            .all()
+        )
+
+    def list_recent_for_course(self, course_id: int, limit: int = 20) -> list[Page]:
+        """The most recently touched pages of a course, newest first.
+
+        Ordered by updated_at with created_at behind it, because a page
+        written last week and corrected today is news again, and material
+        migrated in one batch shares a creation date to the second.
+
+        The limit is a candidate count, not an answer: whoever calls this
+        still has to ask which of them this reader may see, and a page
+        withheld until next Monday must not take a slot from a visible one.
+        Asked for generously and cut down afterwards.
+        """
+        # coalesce rather than two ordering terms with NULLS LAST: MariaDB
+        # rejects that syntax outright, and the fallback is what was meant
+        # anyway, since a page nobody has edited was last touched when it was
+        # written. It also sorts the same way on every database, which two
+        # NULL-ordering rules would not.
+        touched = func.coalesce(Page.updated_at, Page.created_at)
+        return (
+            Page.query.filter_by(course_id=course_id)
+            .order_by(touched.desc(), Page.id.desc())
+            .limit(limit)
             .all()
         )
 

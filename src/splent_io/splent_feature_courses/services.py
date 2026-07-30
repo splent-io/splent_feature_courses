@@ -134,6 +134,35 @@ class CoursesService(BaseService):
             if self.page_visible(page, user, now)
         ]
 
+    def recent_pages(
+        self, course: Course, user=None, limit: int = 6, now=None
+    ) -> list[Page]:
+        """What has changed lately in this course, as this reader sees it.
+
+        Visibility is decided here, per page, the same way it is everywhere
+        else: a page withheld until next Monday is exactly the kind of thing
+        a "recently added" list would announce by name, and the title is the
+        whole leak.
+
+        More candidates are asked for than are shown, so a run of withheld
+        pages at the top does not leave the list short.
+        """
+        now = now or _utcnow()
+        recent = []
+        for page in self.pages.list_recent_for_course(course.id, limit=limit * 4):
+            if not self.page_visible(page, user, now):
+                continue
+            if page.category_id is not None and not self.category_visible(
+                page.category, user, now
+            ):
+                # A page inside a section nobody may see yet is not visible
+                # material, whatever the page itself says.
+                continue
+            recent.append(page)
+            if len(recent) >= limit:
+                break
+        return recent
+
     # ── Reading ──────────────────────────────────────────────────────────
 
     def course_by_slug(self, slug: str) -> Course | None:

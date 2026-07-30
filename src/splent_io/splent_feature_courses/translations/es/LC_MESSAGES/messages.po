@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-30 15:44+0000\n"
+"POT-Creation-Date: 2026-07-30 17:08+0000\n"
 "PO-Revision-Date: 2026-07-30 12:00+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Generated-By: Babel 2.18.0\n"
 
 #: src/splent_io/splent_feature_courses/hooks.py:49
-#: src/splent_io/splent_feature_courses/routes.py:250
+#: src/splent_io/splent_feature_courses/routes.py:188
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:4
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:9
 #: src/splent_io/splent_feature_courses/templates/courses/hooks/admin_sidebar.html:5
@@ -28,62 +28,70 @@ msgstr ""
 msgid "Courses"
 msgstr "Cursos"
 
-#: src/splent_io/splent_feature_courses/routes.py:232
+#: src/splent_io/splent_feature_courses/routes.py:170
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:73
 msgid "Attachment"
 msgstr "Adjunto"
 
-#: src/splent_io/splent_feature_courses/routes.py:443
+#: src/splent_io/splent_feature_courses/routes.py:388
 msgid "No category"
 msgstr "Sin categoría"
 
-#: src/splent_io/splent_feature_courses/routes.py:500
+#: src/splent_io/splent_feature_courses/routes.py:445
 #, python-format
 msgid "Created %(name)s."
 msgstr "Se ha creado %(name)s."
 
-#: src/splent_io/splent_feature_courses/routes.py:524
-#: src/splent_io/splent_feature_courses/routes.py:619
-#: src/splent_io/splent_feature_courses/routes.py:706
+#: src/splent_io/splent_feature_courses/routes.py:469
+#: src/splent_io/splent_feature_courses/routes.py:564
+#: src/splent_io/splent_feature_courses/routes.py:651
 #, python-format
 msgid "Saved %(name)s."
 msgstr "Se ha guardado %(name)s."
 
-#: src/splent_io/splent_feature_courses/routes.py:551
+#: src/splent_io/splent_feature_courses/routes.py:496
 msgid "A name is required to copy a course."
 msgstr "Hace falta un nombre para copiar el curso."
 
-#: src/splent_io/splent_feature_courses/routes.py:558
+#: src/splent_io/splent_feature_courses/routes.py:503
 #, python-format
 msgid "Copied into %(name)s."
 msgstr "Se ha copiado en %(name)s."
 
-#: src/splent_io/splent_feature_courses/routes.py:570
-#: src/splent_io/splent_feature_courses/routes.py:642
-#: src/splent_io/splent_feature_courses/routes.py:750
-#: src/splent_io/splent_feature_courses/routes.py:762
+#: src/splent_io/splent_feature_courses/routes.py:515
+#: src/splent_io/splent_feature_courses/routes.py:587
+#: src/splent_io/splent_feature_courses/routes.py:695
+#: src/splent_io/splent_feature_courses/routes.py:707
 #, python-format
 msgid "Removed %(name)s."
 msgstr "Se ha eliminado %(name)s."
 
-#: src/splent_io/splent_feature_courses/routes.py:594
-#: src/splent_io/splent_feature_courses/routes.py:675
+#: src/splent_io/splent_feature_courses/routes.py:539
+#: src/splent_io/splent_feature_courses/routes.py:620
 #, python-format
 msgid "Added %(name)s."
 msgstr "Se ha añadido %(name)s."
 
-#: src/splent_io/splent_feature_courses/routes.py:724
+#: src/splent_io/splent_feature_courses/routes.py:669
 msgid "Choose a file to upload."
 msgstr "Elige un fichero para subir."
 
-#: src/splent_io/splent_feature_courses/routes.py:731
+#: src/splent_io/splent_feature_courses/routes.py:676
 msgid "That file could not be stored."
 msgstr "No se ha podido guardar ese fichero."
 
-#: src/splent_io/splent_feature_courses/routes.py:733
+#: src/splent_io/splent_feature_courses/routes.py:678
 #, python-format
 msgid "Attached %(name)s."
 msgstr "Se ha adjuntado %(name)s."
+
+#: src/splent_io/splent_feature_courses/templates/courses/_course_aside.html:19
+msgid "Contents of this course"
+msgstr "Contenido de este curso"
+
+#: src/splent_io/splent_feature_courses/templates/courses/_course_aside.html:56
+msgid "Recently added"
+msgstr "Añadido recientemente"
 
 #: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:10
 #: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:12
@@ -107,9 +115,9 @@ msgid "Nothing here yet."
 msgstr "Aquí todavía no hay nada."
 
 #: src/splent_io/splent_feature_courses/templates/courses/category.html:27
-#, fuzzy, python-format
+#, python-format
 msgid "Back to %(course)s"
-msgstr "Volver a los cursos"
+msgstr "Volver a %(course)s"
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:22
 #: src/splent_io/splent_feature_courses/templates/courses/course.html:7
@@ -136,12 +144,8 @@ msgstr "Todos los cursos académicos, del más reciente al más antiguo."
 msgid "There is nothing published here yet."
 msgstr "Aquí todavía no hay nada publicado."
 
-#: src/splent_io/splent_feature_courses/templates/courses/page.html:15
-msgid "Breadcrumb"
-msgstr "Ruta de navegación"
-
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:65
-#: src/splent_io/splent_feature_courses/templates/courses/page.html:30
+#: src/splent_io/splent_feature_courses/templates/courses/page.html:29
 msgid "Files"
 msgstr "Archivos"
 
@@ -151,9 +155,10 @@ msgstr "Visibilidad"
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:31
 msgid "Withheld from readers until you clear this, whatever the date below says."
-msgstr "Oculto para los lectores hasta que lo desmarques, diga lo que diga la fecha de abajo."
-"Retenido para los lectores hasta que desmarques esto, diga lo que diga la"
-" fecha de abajo."
+msgstr ""
+"Oculto para los lectores hasta que lo desmarques, diga lo que diga la "
+"fecha de abajo.Retenido para los lectores hasta que desmarques esto, diga"
+" lo que diga la fecha de abajo."
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:36
 #, python-format
@@ -324,9 +329,10 @@ msgstr "Todavía no hay cursos."
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:37
 msgid "Markdown. Tables, footnotes and existing HTML are all kept."
-msgstr "Markdown. Se conservan las tablas, las notas al pie y el HTML que ya hubiera."
+msgstr ""
 "Markdown. Se conservan las tablas, las notas al pie y el HTML que ya "
-"hubiera."
+"hubiera.Markdown. Se conservan las tablas, las notas al pie y el HTML que"
+" ya hubiera."
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:44
 msgid "Preview"
@@ -355,4 +361,7 @@ msgstr "Esta página no tiene archivos adjuntos."
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:103
 msgid "Optional, defaults to the file name"
 msgstr "Opcional, por defecto el nombre del fichero"
+
+#~ msgid "Breadcrumb"
+#~ msgstr "Ruta de navegación"
 

@@ -380,3 +380,109 @@
     list-style: none;
     padding-left: .2rem;
 }
+
+/* ── A page, with the rest of its course beside it ──────────────────────────
+   Two columns on a wide screen, one on a narrow one, and the aside goes
+   underneath rather than above when they stack: someone who opened a lab
+   script came for the script. */
+.course-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.5rem;
+}
+
+@media (min-width: 1000px) {
+    .course-layout {
+        grid-template-columns: minmax(0, 1fr) 17rem;
+        align-items: start;
+    }
+}
+
+.course-layout__main {
+    min-width: 0;
+}
+
+/* Follows the reader down a long page, which is the whole reason it is a
+   navigation and not a footer. Stops short of the viewport top so a heading
+   the reader just clicked is not hidden behind it. */
+@media (min-width: 1000px) {
+    .course-aside {
+        position: sticky;
+        top: 1.5rem;
+        max-height: calc(100vh - 3rem);
+        overflow-y: auto;
+        /* Room for the scrollbar, so the text does not sit under it. */
+        padding-inline-end: .35rem;
+    }
+}
+
+.course-aside__block + .course-aside__block {
+    margin-block-start: 2rem;
+}
+
+.course-aside__title {
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--brand-muted);
+    margin: 0 0 .75rem;
+}
+
+.course-aside__section + .course-aside__section {
+    margin-block-start: 1.1rem;
+}
+
+.course-aside__section-name {
+    display: block;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--brand-heading);
+    margin-block-end: .35rem;
+}
+
+.course-aside__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.course-aside__list li + li {
+    margin-block-start: .1rem;
+}
+
+.course-aside__link {
+    display: block;
+    font-size: .875rem;
+    line-height: 1.45;
+    color: var(--brand-muted);
+    padding: .22rem 0 .22rem .7rem;
+    /* A rule down the left, which fills in on the page being read. Quieter
+       than a background block and it survives a long title wrapping. */
+    border-inline-start: 2px solid var(--brand-border);
+}
+
+.course-aside__link:hover {
+    color: var(--brand-primary);
+    border-inline-start-color: color-mix(in srgb, var(--brand-primary) 45%, transparent);
+    text-decoration: none;
+}
+
+.course-aside__link.is-current {
+    color: var(--brand-primary);
+    font-weight: 600;
+    border-inline-start-color: var(--brand-primary);
+}
+
+/* Which section a recent page belongs to. Said quietly, because the title is
+   what a reader is scanning for. */
+.course-aside__where {
+    display: block;
+    font-size: .75rem;
+    color: var(--brand-muted);
+    padding-inline-start: .7rem;
+}
+
+.course-aside__list--recent li + li {
+    margin-block-start: .55rem;
+}

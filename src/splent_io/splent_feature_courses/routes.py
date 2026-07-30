@@ -120,6 +120,31 @@ def _visible_course_or_404(course_slug: str):
     return course
 
 
+def _external_links_open_beside(default: bool = True) -> bool:
+    """Whether a link out of the wiki opens in a tab of its own.
+
+    True by default, because that is what a wiki is: a reader following a
+    reference to a Vagrant manual is not leaving the lab script, they are
+    checking something, and taking the page away from them loses their
+    place in a document they were halfway through.
+
+    Read from the admin's settings, so a product can decide otherwise
+    without a redeploy. Read per request rather than cached because a
+    setting changed in the panel has to take effect on the next page, and
+    a wrong answer here is a link that behaves oddly, not a broken page:
+    when the settings feature is not installed the default stands.
+    """
+    try:
+        value = service_proxy("SettingsService").get(
+            "courses_external_links_new_tab", None
+        )
+    except Exception:
+        return default
+    if value in (None, ""):
+        return default
+    return str(value).strip().lower() not in ("0", "false", "no", "off")
+
+
 def _sections(course):
     """A course as it reads: each visible category with its visible pages."""
     return [
@@ -239,9 +264,19 @@ def page_detail(course_slug, page_slug):
         "courses/page.html",
         course=course,
         page=page,
-        body_html=render_markdown(page.body_md),
+        body_html=render_markdown(
+            page.body_md,
+            external_links_new_tab=_external_links_open_beside(),
+        ),
         attachments=_attachment_links(page),
         breadcrumb=_trail(course, page.category, page),
+        # A page is read on its own, and a reader who finishes one has
+        # nowhere to go but back. These two put the rest of the course
+        # beside it: everything it holds, and what moved lately. Both are
+        # about the course this page belongs to, whichever page that is.
+        sections=_sections(course),
+        uncategorised=_uncategorised(course),
+        recent=courses_service.recent_pages(course, current_user),
     )
 
 
@@ -710,7 +745,17 @@ def _page_form(form, course, page):
     otherwise, and the preview keeps working with the textarea a browser
     already provides.
     """
-    preview_html = render_markdown(form.body_md.data) if form.preview.data else None
+    # The preview shows what a reader will see, links included: an editor
+    # checking a reference should find out here that it opens beside the
+    # page rather than after publishing it.
+    preview_html = (
+        render_markdown(
+            form.body_md.data,
+            external_links_new_tab=_external_links_open_beside(),
+        )
+        if form.preview.data
+        else None
+    )
     return render_template(
         "courses/admin/page_form.html",
         form=form,

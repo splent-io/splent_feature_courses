@@ -378,3 +378,204 @@ class CoursesService(BaseService):
             item.publish_at = publish_at
         db.session.commit()
         return item
+
+
+# ── Searchable material ──────────────────────────────────────────────────
+#
+# What this feature offers to whatever search a product installs, through
+# the framework's registry. Three callables and no import of any search
+# feature, so a product can install an engine, a plain search page or
+# neither, and this code does not change.
+#
+# The split between them is the point. A document is what the material
+# says; a result is what a particular reader is allowed to be told about
+# it. Only the second question involves visibility, and it is asked here,
+# now, per hit, because the first answer is written into an index and read
+# for days afterwards.
+
+
+SNIPPET_LENGTH = 200
+# How much of the body to keep before the match, so the extract reads as a
+# sentence the term appears in rather than starting on top of it.
+SNIPPET_CONTEXT = 60
+
+_CODE_FENCE = re.compile(r"```.*?```", re.DOTALL)
+_IMAGE = re.compile(r"!\[[^\]]*\]\([^)]*\)")
+_LINK = re.compile(r"\[([^\]]*)\]\([^)]*\)")
+_INLINE_CODE = re.compile(r"`([^`]*)`")
+_HTML_TAG = re.compile(r"<[^>]+>")
+_LIST_BULLET = re.compile(r"^[ \t]*(?:[-+*]|\d+\.)[ \t]+", re.MULTILINE)
+_MARKUP = re.compile(r"[*_~>#`|]+")
+_WHITESPACE = re.compile(r"\s+")
+
+
+def plain_text(body_md: str) -> str:
+    """The prose inside a markdown body, near enough to read.
+
+    Not a parser and not trying to be one. A snippet is two lines shown
+    next to a title, and rendering the body properly to produce it would
+    mean loading the whole markdown reader for every hit. Syntax is
+    stripped rather than interpreted, which keeps a link's words and drops
+    its URL, so a reader is not shown a line of raw asterisks and pipes as
+    the reason a page matched.
+    """
+    text = _CODE_FENCE.sub(" ", body_md or "")
+    text = _IMAGE.sub(" ", text)
+    text = _LINK.sub(r"\1", text)
+    text = _INLINE_CODE.sub(r"\1", text)
+    text = _HTML_TAG.sub(" ", text)
+    text = _LIST_BULLET.sub("", text)
+    text = _MARKUP.sub("", text)
+    return _WHITESPACE.sub(" ", text).strip()
+
+
+def _snippet(text: str, term: str = "") -> str:
+    """A short extract, around the match when there is one.
+
+    A plain substring window rather than a highlighter, because whoever
+    displays a result escapes it: markup put in here would either be shown
+    as source or have to be trusted, and neither is worth it for a line of
+    context. With no term, or with a term that only matched a title, the
+    opening of the page still says what it is about.
+    """
+    if not text:
+        return ""
+    term = (term or "").strip()
+    position = text.lower().find(term.lower()) if term else -1
+    start = max(0, position - SNIPPET_CONTEXT) if position >= 0 else 0
+    end = start + SNIPPET_LENGTH
+    extract = text[start:end].strip()
+    if start > 0:
+        extract = f"...{extract}"
+    if end < len(text):
+        extract = f"{extract}..."
+    return extract
+
+
+def _page_url(page: Page) -> str:
+    """Where a page reads, for callers holding only the page.
+
+    The URL builder is imported here rather than at module level because
+    this feature's package imports this module to expose the service, so
+    the other direction has to wait until something actually asks.
+    """
+    from splent_io.splent_feature_courses import page_url
+
+    return page_url(page.course, page)
+
+
+def _page_result(page: Page, term: str = "") -> dict:
+    """One page as a result, however it was found.
+
+    The course and the section come with it because a wiki holding ten
+    academic years has a page called "Lab 5" in every one of them, and a
+    title on its own does not tell the reader which year they just found.
+    """
+    return {
+        "title": page.name,
+        "url": _page_url(page),
+        "snippet": _snippet(plain_text(page.body_md), term),
+        "course": page.course.name,
+        "category": page.category.name if page.category is not None else "",
+    }
+
+
+def search_fetch():
+    """Every page there is, for a search feature to index.
+
+    Nothing about visibility is in a document, and that is deliberate:
+    not hidden, not publish_at, not the course's. An index is written once
+    and read for days, so an answer about who may read a page would be
+    wrong from the moment staff withheld it, and a stale yes is the leak
+    this whole feature exists to prevent. An index proposes candidates and
+    search_resolve decides, which also means a page withheld after it was
+    indexed simply stops appearing, with no reindex to remember.
+
+    The body is stored as text rather than as markdown so that a query is
+    matched against what the page says and not against its syntax.
+    """
+    service = CoursesService()
+    for page in service.pages.iter_all():
+        yield {
+            "id": str(page.id),
+            "title": page.name,
+            "body": plain_text(page.body_md),
+            "url": _page_url(page),
+            "course": page.course.name,
+            "category": page.category.name if page.category is not None else "",
+        }
+
+
+def search_resolve(doc_id, user=None) -> dict | None:
+    """The page behind one candidate, if this reader may see it.
+
+    The authority the registry promises, asked at request time and once
+    per hit. It is page_visible that answers, the same call the page's own
+    URL makes, so a result can never appear for material that would answer
+    404 on arrival, and a title is withheld exactly as its body is.
+
+    A primary key lookup, because a page of results asks this twenty
+    times.
+    """
+    try:
+        page_id = int(doc_id)
+    except (TypeError, ValueError):
+        # Ids come back from an index as strings, and an index can outlive
+        # the material it was built from, so an unusable id is a candidate
+        # to drop rather than an error to raise.
+        return None
+    service = CoursesService()
+    page = service.pages.get_by_id(page_id)
+    if not service.page_visible(page, user):
+        return None
+    return _page_result(page)
+
+
+def search_resolve_many(doc_ids, user=None) -> dict:
+    """A whole page of candidates at once, keeping only what may be seen.
+
+    A search asks about far more candidates than it shows, because withheld
+    material outranks visible material as often as not, and asking one page
+    at a time turns that into one query instead of hundreds. The reason is
+    not only speed. Answering per id makes the time a search takes depend
+    on how much withheld material matched the term, and a reader who can
+    measure that can ask questions about material they may not read: a term
+    matching twenty unreleased pages and a term matching nothing both
+    answer "no results", but they do not take the same time. One query for
+    the batch, with the course and the category already joined, flattens
+    that.
+
+    Returns {doc_id: result} for the ones this reader may see, keyed by the
+    id as it arrived so the caller can preserve the engine's ranking.
+    """
+    wanted = {}
+    for doc_id in doc_ids:
+        try:
+            wanted[int(doc_id)] = doc_id
+        except (TypeError, ValueError):
+            # An index outlives the material it was built from, so an
+            # unusable id is a candidate to drop, not an error to raise.
+            continue
+    if not wanted:
+        return {}
+
+    service = CoursesService()
+    now = _utcnow()
+    resolved = {}
+    for page in service.pages.by_ids(list(wanted)):
+        if service.page_visible(page, user, now):
+            resolved[wanted[page.id]] = _page_result(page)
+    return resolved
+
+
+def search_find(term: str, user=None) -> list[dict]:
+    """Matching pages for a product with no engine, or one that is down.
+
+    Exactly search_pages, presented the way the registry expects. Written
+    as a call rather than as a second query on purpose: a fallback that
+    filtered visibility its own way would be the one place the rule could
+    drift, and it would drift silently, because the fallback only runs
+    when the engine is unreachable.
+    """
+    service = CoursesService()
+    return [_page_result(page, term) for page in service.search_pages(term, user=user)]

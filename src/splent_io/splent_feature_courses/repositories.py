@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 
 from splent_io.splent_feature_courses.models import (
     KIND_FILE,
@@ -84,6 +85,39 @@ class PageRepository(BaseRepository):
 
     def get_by_legacy_id(self, legacy_id: int) -> Page | None:
         return Page.query.filter_by(legacy_id=legacy_id).first()
+
+    def iter_all(self, batch_size: int = 500):
+        """Every page there is, oldest first, streamed rather than listed.
+
+        A full reindex is what asks for this, and it walks a decade of
+        academic years in one pass, so the rows arrive in batches instead
+        of all at once. The course and the category come along in the same
+        query because each document names them, and reaching for them per
+        page would be two round trips times a few thousand. Both are
+        many-to-one, which is the case yield_per allows.
+        """
+        return (
+            Page.query.options(joinedload(Page.course), joinedload(Page.category))
+            .order_by(Page.id)
+            .yield_per(batch_size)
+        )
+
+    def by_ids(self, page_ids: list[int]) -> list[Page]:
+        """Several pages in one query, with what visibility depends on.
+
+        A page of search results asks about every candidate the engine
+        proposed, most of which the reader will not be allowed to see. One
+        query per candidate would be three round trips each once the course
+        and the category are touched, and the time that takes would then
+        depend on how much withheld material matched.
+        """
+        if not page_ids:
+            return []
+        return (
+            Page.query.options(joinedload(Page.course), joinedload(Page.category))
+            .filter(Page.id.in_(page_ids))
+            .all()
+        )
 
     def next_position(self, category_id: int) -> int:
         last = (

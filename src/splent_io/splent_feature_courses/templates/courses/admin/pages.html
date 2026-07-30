@@ -1,0 +1,88 @@
+{% extends "base_template.html" %}
+{% from "courses/admin/_form.html" import flashes, state_badge %}
+
+{% block title %}{{ _('Pages') }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h3 mb-0">{{ _('Pages') }}</h1>
+    <p class="text-muted mb-0">{{ _('Everything written in this wiki, most recently edited first.') }}</p>
+</div>
+
+{{ flashes() }}
+
+{# GET, so a filtered list is a URL somebody can send to a colleague. #}
+<form method="GET" class="card mb-4">
+    <div class="card-body row g-2 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label" for="q">{{ _('Title contains') }}</label>
+            <input class="form-control" id="q" name="q" value="{{ term }}"
+                   placeholder="{{ _('Vagrant, exam, lab 5…') }}">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="course">{{ _('Course') }}</label>
+            <select class="form-select" id="course" name="course">
+                <option value="">{{ _('All courses') }}</option>
+                {% for c in courses %}
+                <option value="{{ c.id }}" {{ 'selected' if course_id == c.id }}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">{{ _('Filter') }}</button>
+            {% if term or course_id %}
+            <a href="{{ url_for('courses.admin_pages') }}" class="btn btn-link text-muted">{{ _('Clear') }}</a>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>{{ _('Page') }}</th>
+                    <th>{{ _('Course') }}</th>
+                    <th>{{ _('Section') }}</th>
+                    <th>{{ _('State') }}</th>
+                    <th>{{ _('Last edited') }}</th>
+                    <th class="text-end">{{ _('Actions') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for page in pages %}
+                <tr>
+                    <td><a href="{{ url_for('courses.admin_page_edit', page_id=page.id) }}">{{ page.name }}</a></td>
+                    <td class="text-muted">{{ page.course.name }}</td>
+                    <td class="text-muted">{{ page.category.name if page.category else '—' }}</td>
+                    <td>{{ state_badge(page) }}</td>
+                    <td class="text-muted">{{ (page.updated_at or page.created_at) | course_datetime }}</td>
+                    <td class="text-end">
+                        <a href="{{ page_url(page.course, page) }}" class="btn btn-sm btn-outline-secondary">{{ _('View') }}</a>
+                        <a href="{{ url_for('courses.admin_page_history', page_id=page.id) }}" class="btn btn-sm btn-outline-secondary">{{ _('History') }}</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-muted text-center py-4">
+                        {% if term or course_id %}
+                        {{ _('No page matches that. Try a shorter word, or clear the filter.') }}
+                        {% else %}
+                        {{ _('There are no pages yet.') }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if pages | length >= 200 %}
+    {# Said out loud rather than truncating in silence: a list that stops at
+       two hundred without saying so reads as "that is all there is". #}
+    <div class="card-footer text-muted small">
+        {{ _('Showing the 200 most recently edited. Narrow the filter to see further back.') }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

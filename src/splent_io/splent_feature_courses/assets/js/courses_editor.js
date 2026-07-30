@@ -27,6 +27,60 @@
             return;
         }
 
+        // The live preview asks the server, not a bundled renderer. The
+        // library's own previewer is a different markdown engine: no code
+        // highlighting, none of the plugins, another sanitiser, so what it
+        // showed was almost the published page, and "almost" is exactly
+        // what an editor cannot check against. Debounced, and stamped with
+        // a sequence number so a slow response can never overwrite a newer
+        // one.
+        var previewUrl = textarea.getAttribute("data-preview-url");
+        var csrfField = document.querySelector('input[name="csrf_token"]');
+        var timer = null;
+        var seq = 0;
+
+        function renderPreview(text, preview) {
+            if (!previewUrl) {
+                return "";
+            }
+            var mine = ++seq;
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                fetch(previewUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-CSRFToken": csrfField ? csrfField.value : "",
+                    },
+                    body: "body_md=" + encodeURIComponent(text),
+                })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error(String(response.status));
+                        }
+                        return response.text();
+                    })
+                    .then(function (html) {
+                        // The server sanitised this exactly as it does for
+                        // readers; the editor adds nothing on top.
+                        if (mine === seq) {
+                            preview.innerHTML = html;
+                        }
+                    })
+                    .catch(function () {
+                        if (mine === seq) {
+                            preview.innerHTML =
+                                "<p class=\"text-muted\">" +
+                                "La previsualizaci\u00f3n no responde; " +
+                                "el contenido se guarda igualmente.</p>";
+                        }
+                    });
+            }, 350);
+            // Shown until the fetch lands; keeping the old markup avoids a
+            // flash of empty panel between keystrokes.
+            return preview.innerHTML || "";
+        }
+
         new EasyMDE({
             element: textarea,
             // The textarea is the form field, so its value has to stay
@@ -36,6 +90,11 @@
             spellChecker: false,
             status: ["lines", "words"],
             minHeight: "420px",
+            previewRender: renderPreview,
+            // The preview panel dresses as the page it will become:
+            // cms-public and site-main are the selectors the theme and the
+            // skin scope the reading styles under, prose is the measure.
+            previewClass: ["editor-preview", "cms-public", "site-main", "prose"],
             // Only the marks course material is written with. A shorter
             // toolbar is faster to learn than a complete one.
             toolbar: [

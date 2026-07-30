@@ -402,19 +402,12 @@
     min-width: 0;
 }
 
-/* Follows the reader down a long page, which is the whole reason it is a
-   navigation and not a footer. Stops short of the viewport top so a heading
-   the reader just clicked is not hidden behind it. */
-@media (min-width: 1000px) {
-    .course-aside {
-        position: sticky;
-        top: 1.5rem;
-        max-height: calc(100vh - 3rem);
-        overflow-y: auto;
-        /* Room for the scrollbar, so the text does not sit under it. */
-        padding-inline-end: .35rem;
-    }
-}
+/* The aside scrolls with the page, deliberately. It used to be sticky with
+   an internal scrollbar, and a scrollbar inside a menu is two scrollbars on
+   one screen: the reader's wheel grabs whichever one the cursor happens to
+   be over, and a fourteen-section course showed a permanent bar down the
+   middle of the layout. A panel that moves with the document has neither
+   problem, and the page's own scrollbar is the one the reader already has. */
 
 .course-aside__block + .course-aside__block {
     margin-block-start: 2rem;

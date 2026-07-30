@@ -1,0 +1,55 @@
+{% extends "base_template.html" %}
+{% from "courses/admin/_form.html" import flashes %}
+
+{% block title %}{{ _('Activity') }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h3 mb-0">{{ _('Activity') }}</h1>
+    <p class="text-muted mb-0">{{ _('Recent edits across the whole wiki. Each row is what a page said before that save.') }}</p>
+</div>
+
+{{ flashes() }}
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>{{ _('When') }}</th>
+                    <th>{{ _('Page') }}</th>
+                    <th>{{ _('Course') }}</th>
+                    <th>{{ _('By') }}</th>
+                    <th class="text-end">{{ _('Actions') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for revision in revisions %}
+                <tr>
+                    <td class="text-muted">{{ revision.created_at | course_datetime }}</td>
+                    <td>
+                        {# The page's current name, not the archived one: this
+                           row is a way in, and a link labelled with a title
+                           the page no longer has is a link nobody trusts. The
+                           old title is on the comparison screen. #}
+                        <a href="{{ url_for('courses.admin_page_edit', page_id=revision.page_id) }}">{{ revision.page.name }}</a>
+                    </td>
+                    <td class="text-muted">{{ revision.page.course.name }}</td>
+                    <td class="text-muted">{{ revision.author_email or _('unknown') }}</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('courses.admin_page_revision', page_id=revision.page_id, revision_id=revision.id) }}"
+                           class="btn btn-sm btn-outline-secondary">{{ _('Compare') }}</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-muted text-center py-4">
+                        {{ _('Nothing has been edited yet. Saves from now on appear here.') }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -13,6 +13,7 @@
         <a href="{{ url_for('courses.admin_course_edit', course_id=course.id) }}" class="btn btn-outline-secondary">{{ _('Back to the course') }}</a>
         {% if page %}
         <a href="{{ page_url(course, page) }}" class="btn btn-outline-secondary">{{ _('View') }}</a>
+        <a href="{{ url_for('courses.admin_page_history', page_id=page.id) }}" class="btn btn-outline-secondary">{{ _('History') }}</a>
         {% endif %}
     </div>
 </div>
@@ -33,7 +34,9 @@
                 {# The editor attaches to this attribute and writes back into
                    the field, so the form posts markdown either way and the
                    page stays editable if the script does not load. #}
-                {{ form.body_md(class="form-control font-monospace", rows=24, **{"data-courses-editor": "1"}) }}
+                {{ form.body_md(class="form-control font-monospace", rows=24,
+                   **{"data-courses-editor": "1",
+                      "data-preview-url": url_for('courses.admin_preview')}) }}
                 <div class="form-text">{{ _('Markdown. Tables, footnotes and existing HTML are all kept.') }}</div>
                 {% for error in form.body_md.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
             </div>

@@ -18,6 +18,8 @@ from splent_io.splent_feature_courses.repositories import (
     CourseRepository,
     PageAttachmentRepository,
     PageRepository,
+    PageRevisionRepository,
+    WikiRepository,
 )
 from splent_framework.db import db
 from splent_framework.services.BaseService import BaseService
@@ -65,6 +67,8 @@ class CoursesService(BaseService):
         self.categories = CategoryRepository()
         self.pages = PageRepository()
         self.attachments = PageAttachmentRepository()
+        self.revisions = PageRevisionRepository()
+        self.wiki = WikiRepository()
 
     # ── Who is asking ────────────────────────────────────────────────────
 
@@ -162,6 +166,68 @@ class CoursesService(BaseService):
             if len(recent) >= limit:
                 break
         return recent
+
+
+    # ── History ──────────────────────────────────────────────────────────
+    #
+    # One place decides what gets archived, and it is this one. A revision
+    # written from a route would be a revision missing from every other way
+    # a page can be saved, and "the history is missing the edit that broke
+    # it" is the only way a history can be worse than none at all.
+
+    #: How many revisions a page keeps. A page edited every week all year
+    #: fits inside this with room to spare; a page edited daily for a
+    #: decade does not, and nobody has ever asked for its four-hundredth.
+    REVISION_LIMIT = 200
+
+    def save_page(self, page: Page, *, name: str, body_md: str, author=None, **rest):
+        """Save a page, keeping what it said before.
+
+        The revision is written first and only when the writing actually
+        changed. Saving a page to move it between categories, or to change
+        its release date, is not an edit anybody needs to undo, and
+        recording it would bury the edits that matter under noise.
+
+        Returns True when a revision was written, so a caller can tell the
+        person whether their change is recoverable.
+        """
+        wrote_revision = False
+        new_name = (name or "").strip()
+        new_body = body_md or ""
+        if page.name != new_name or (page.body_md or "") != new_body:
+            self.revisions.create(
+                page_id=page.id,
+                name=page.name,
+                body_md=page.body_md or "",
+                author_id=getattr(author, "id", None),
+                # The address is copied rather than joined, so the history
+                # still says who wrote what after the account is closed.
+                author_email=getattr(author, "email", None),
+            )
+            wrote_revision = True
+
+        self.pages.update(page.id, name=new_name, body_md=new_body, **rest)
+        if wrote_revision:
+            self.revisions.trim_to(page.id, self.REVISION_LIMIT)
+        return wrote_revision
+
+    def restore_revision(self, page: Page, revision, author=None):
+        """Put an old version back, keeping the one being replaced.
+
+        Restoring is an edit like any other: it goes through save_page, so
+        what the page says right now is archived before it is overwritten
+        and a restore can itself be undone. A history that lost the present
+        when reaching into the past would be a trap.
+        """
+        return self.save_page(
+            page,
+            name=revision.name,
+            body_md=revision.body_md or "",
+            author=author,
+        )
+
+    def page_history(self, page: Page, limit: int | None = None):
+        return self.revisions.list_for_page(page.id, limit=limit)
 
     # ── Reading ──────────────────────────────────────────────────────────
 

@@ -1,0 +1,68 @@
+{% extends "base_template.html" %}
+{% from "courses/admin/_form.html" import flashes %}
+
+{% block title %}{{ _('History of %(name)s', name=page.name) }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-start gap-2 mb-4">
+    <div>
+        <h1 class="h3 mb-0">{{ _('History') }}</h1>
+        <p class="text-muted mb-0">{{ page.name }} · {{ course.name }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('courses.admin_page_edit', page_id=page.id) }}" class="btn btn-outline-secondary">{{ _('Back to the page') }}</a>
+    </div>
+</div>
+
+{{ flashes() }}
+
+<div class="card">
+    <div class="card-header">
+        <strong>{{ _('Previous versions') }}</strong>
+        <div class="text-muted small">
+            {{ _('Each entry is what the page said before that edit. The newest is at the top.') }}
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>{{ _('Saved over') }}</th>
+                    <th>{{ _('Title at the time') }}</th>
+                    <th>{{ _('By') }}</th>
+                    <th class="text-end">{{ _('Actions') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for revision in revisions %}
+                <tr>
+                    <td>{{ revision.created_at | course_datetime }}</td>
+                    <td>
+                        {{ revision.name }}
+                        {% if revision.name != page.name %}
+                        {# Worth saying out loud: a renamed page is an edit a
+                           reader notices as much as a rewritten paragraph. #}
+                        <span class="badge bg-secondary">{{ _('renamed since') }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted">{{ revision.author_email or _('unknown') }}</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('courses.admin_page_revision', page_id=page.id, revision_id=revision.id) }}"
+                           class="btn btn-sm btn-outline-secondary">{{ _('Compare') }}</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-muted text-center py-4">
+                        {# Not an error. A page that has never been edited since
+                           the history began simply has none, and saying so
+                           plainly beats an empty table. #}
+                        {{ _('This page has not been edited since the history started.') }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

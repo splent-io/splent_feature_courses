@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-30 17:08+0000\n"
+"POT-Creation-Date: 2026-07-30 22:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: src/splent_io/splent_feature_courses/hooks.py:49
-#: src/splent_io/splent_feature_courses/routes.py:188
+#: src/splent_io/splent_feature_courses/hooks.py:30
+#: src/splent_io/splent_feature_courses/routes.py:242
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:4
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:9
 #: src/splent_io/splent_feature_courses/templates/courses/hooks/admin_sidebar.html:5
@@ -27,59 +27,96 @@ msgstr ""
 msgid "Courses"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:170
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:73
+#: src/splent_io/splent_feature_courses/hooks.py:31
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:4
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:8
+msgid "Pages"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/hooks.py:32
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:4
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:8
+msgid "Activity"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/hooks.py:33
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:4
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:8
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:68
+#: src/splent_io/splent_feature_courses/templates/courses/page.html:29
+msgid "Files"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/hooks.py:80
+msgid "Wiki"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:224
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:62
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:76
 msgid "Attachment"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:388
+#: src/splent_io/splent_feature_courses/routes.py:445
 msgid "No category"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:445
+#: src/splent_io/splent_feature_courses/routes.py:502
 #, python-format
 msgid "Created %(name)s."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:469
-#: src/splent_io/splent_feature_courses/routes.py:564
-#: src/splent_io/splent_feature_courses/routes.py:651
+#: src/splent_io/splent_feature_courses/routes.py:526
+#: src/splent_io/splent_feature_courses/routes.py:621
+#: src/splent_io/splent_feature_courses/routes.py:721
 #, python-format
 msgid "Saved %(name)s."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:496
+#: src/splent_io/splent_feature_courses/routes.py:553
 msgid "A name is required to copy a course."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:503
+#: src/splent_io/splent_feature_courses/routes.py:560
 #, python-format
 msgid "Copied into %(name)s."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:515
-#: src/splent_io/splent_feature_courses/routes.py:587
-#: src/splent_io/splent_feature_courses/routes.py:695
-#: src/splent_io/splent_feature_courses/routes.py:707
+#: src/splent_io/splent_feature_courses/routes.py:572
+#: src/splent_io/splent_feature_courses/routes.py:644
+#: src/splent_io/splent_feature_courses/routes.py:925
+#: src/splent_io/splent_feature_courses/routes.py:943
 #, python-format
 msgid "Removed %(name)s."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:539
-#: src/splent_io/splent_feature_courses/routes.py:620
+#: src/splent_io/splent_feature_courses/routes.py:596
+#: src/splent_io/splent_feature_courses/routes.py:677
 #, python-format
 msgid "Added %(name)s."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:669
+#: src/splent_io/splent_feature_courses/routes.py:715
+#, python-format
+msgid "Saved %(name)s. The previous version is kept in the history."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:878
+#, python-format
+msgid ""
+"Restored the version from %(moment)s. What the page said before is kept "
+"in the history."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:899
 msgid "Choose a file to upload."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:676
+#: src/splent_io/splent_feature_courses/routes.py:906
 msgid "That file could not be stored."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:678
+#: src/splent_io/splent_feature_courses/routes.py:908
 #, python-format
 msgid "Attached %(name)s."
 msgstr ""
@@ -118,7 +155,12 @@ msgstr ""
 msgid "Back to %(course)s"
 msgstr ""
 
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:21
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:22
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:19
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:53
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:23
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:46
 #: src/splent_io/splent_feature_courses/templates/courses/course.html:7
 msgid "Course"
 msgstr ""
@@ -131,6 +173,8 @@ msgstr ""
 msgid "Other material"
 msgstr ""
 
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:21
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:25
 #: src/splent_io/splent_feature_courses/templates/courses/course.html:52
 msgid "All courses"
 msgstr ""
@@ -141,11 +185,6 @@ msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/index.html:23
 msgid "There is nothing published here yet."
-msgstr ""
-
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:65
-#: src/splent_io/splent_feature_courses/templates/courses/page.html:29
-msgid "Files"
 msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:27
@@ -168,8 +207,52 @@ msgid "Visible"
 msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:56
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:81
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:80
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:84
 msgid "Remove"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:9
+msgid ""
+"Recent edits across the whole wiki. Each row is what a page said before "
+"that save."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:19
+msgid "When"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:20
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:52
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:45
+msgid "Page"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:22
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:32
+msgid "By"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:23
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:24
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:55
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:33
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:50
+msgid "Actions"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:38
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:48
+msgid "unknown"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:41
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:51
+msgid "Compare"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:47
+msgid "Nothing has been edited yet. Saves from now on appear here."
 msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/category_form.html:4
@@ -195,7 +278,7 @@ msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/category_form.html:27
 #: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:35
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:56
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:59
 msgid "Cancel"
 msgstr ""
 
@@ -280,12 +363,9 @@ msgstr ""
 msgid "Readers see it"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:24
-msgid "Actions"
-msgstr ""
-
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:36
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:15
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:62
 msgid "View"
 msgstr ""
 
@@ -313,33 +393,201 @@ msgstr ""
 msgid "No courses yet."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:37
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:10
+msgid ""
+"Everything attached anywhere in the wiki. A file is downloadable exactly "
+"when its page is readable."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:28
+msgid "Kind"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:30
+msgid "Everything"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:33
+msgid "Documents"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:34
+msgid "Images in the text"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:38
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:32
+msgid "Filter"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:40
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:34
+msgid "Clear"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:51
+msgid "File"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:54
+msgid "Readable"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:64
+msgid "in the text"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:73
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:78
+msgid "Open"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:77
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:82
+msgid "Remove this file? The stored copy goes with it."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:88
+msgid "No file matches that filter."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:90
+msgid "Nothing has been attached yet. Files are uploaded from a page."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:16
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:9
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:63
+msgid "History"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:40
 msgid "Markdown. Tables, footnotes and existing HTML are all kept."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:44
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:47
 msgid "Preview"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:66
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:69
 msgid ""
 "Attachments inherit this page. They are refused until it is released, to "
 "a link that was forwarded exactly as to a guess."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:75
-msgid "Open"
-msgstr ""
-
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:79
-msgid "Remove this file? The stored copy goes with it."
-msgstr ""
-
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:86
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:89
 msgid "No files attached to this page."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:103
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:106
 msgid "Optional, defaults to the file name"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:4
+#, python-format
+msgid "History of %(name)s"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:13
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_revision.html:17
+msgid "Back to the page"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:21
+msgid "Previous versions"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:23
+msgid ""
+"Each entry is what the page said before that edit. The newest is at the "
+"top."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:30
+msgid "Saved over"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:31
+msgid "Title at the time"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:45
+msgid "renamed since"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:60
+msgid "This page has not been edited since the history started."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_revision.html:4
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_revision.html:9
+#, python-format
+msgid "Version of %(moment)s"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_revision.html:16
+msgid "Back to the history"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_revision.html:22
+msgid "Put this version back? What the page says now is kept in the history."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_revision.html:24
+msgid "Restore this version"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_revision.html:33
+msgid "What changed"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_revision.html:35
+msgid "Lines removed since this version are marked in red, lines added in green."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_revision.html:47
+msgid "The body is identical. Only the title changed."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_revision.html:53
+msgid "This version, as a reader would have seen it"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:9
+msgid "Everything written in this wiki, most recently edited first."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:18
+msgid "Title contains"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:20
+msgid "Vagrant, exam, lab 5…"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:47
+msgid "Section"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:48
+msgid "State"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:49
+msgid "Last edited"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:70
+msgid "No page matches that. Try a shorter word, or clear the filter."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:72
+msgid "There are no pages yet."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:84
+msgid ""
+"Showing the 200 most recently edited. Narrow the filter to see further "
+"back."
 msgstr ""
 

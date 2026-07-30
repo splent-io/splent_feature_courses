@@ -264,3 +264,31 @@ def test_the_back_office_refuses_an_ordinary_account(test_client, test_app, mate
         follow_redirects=True,
     )
     assert test_client.get("/admin/courses").status_code == 403
+
+
+def test_the_live_preview_renders_exactly_what_a_reader_gets(
+    test_client, test_app, material
+):
+    """The editor's preview asks the server, and the server answers with the
+    same pipeline the public page uses: highlighting, plugins and the
+    allowlist included. A client-side preview was almost the published
+    page, and almost is what an editor cannot check against."""
+    _as_staff(test_client)
+
+    response = test_client.post(
+        "/admin/courses/preview",
+        data={"body_md": "``` bash\nvagrant up  # arranca\n```\n<script>x</script>"},
+    )
+
+    assert response.status_code == 200
+    assert b"tok-" in response.data
+    assert b"<script" not in response.data
+
+
+def test_the_preview_is_not_for_readers(test_client, test_app, material):
+    """It renders arbitrary markdown on demand, so it belongs to the people
+    who can already write pages and to nobody else."""
+    response = test_client.post(
+        "/admin/courses/preview", data={"body_md": "# x"}
+    )
+    assert response.status_code in (302, 401, 403)

@@ -155,9 +155,61 @@ class Page(db.Model, VisibilityMixin):
         cascade="all, delete-orphan",
         order_by="PageAttachment.position",
     )
+    revisions = db.relationship(
+        "PageRevision",
+        back_populates="page",
+        cascade="all, delete-orphan",
+        order_by="PageRevision.created_at.desc()",
+    )
 
     def __repr__(self):
         return f"Page<{self.id}:{self.slug}>"
+
+
+class PageRevision(db.Model):
+    """What a page said before somebody changed it.
+
+    A wiki without this is a wiki where one careless save destroys work
+    nobody can get back, and the material here is written once a year by
+    people teaching four other things. The editor is Wikipedia-shaped
+    already; the history is the half that makes that shape safe.
+
+    A revision is the state *before* an edit, written at save time by the
+    only code that writes pages. Storing the previous body rather than a
+    diff is deliberate: a body is a few kilobytes of markdown, a course has
+    a few dozen pages, and a stored diff has to be replayed correctly
+    forever to be worth anything, while a stored body is just the page.
+
+    Nothing here is versioned except what a person types. Position,
+    category and the release date are settings rather than writing: they
+    change often, they carry no work, and recording them would bury the
+    edits that matter under noise.
+    """
+
+    __tablename__ = "course_page_revision"
+
+    id = db.Column(db.Integer, primary_key=True)
+    page_id = db.Column(
+        db.Integer,
+        db.ForeignKey("course_page.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    # The name and body as they stood. Both, because renaming a page is an
+    # edit a reader notices as much as a rewritten paragraph.
+    name = db.Column(db.String(255), nullable=False)
+    body_md = db.Column(db.Text, default="")
+    # Who saved over it. Nullable and never a hard foreign key constraint
+    # on delete: an account can be closed years later and the history of a
+    # course must survive the staff list.
+    author_id = db.Column(db.Integer, nullable=True, index=True)
+    author_email = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime(timezone=True), default=_utcnow, index=True)
+
+    page = db.relationship("Page", back_populates="revisions")
+
+    def __repr__(self):
+        return f"PageRevision<{self.id}:page {self.page_id}>"
 
 
 #: A file the reader downloads, listed under the page.

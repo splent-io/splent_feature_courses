@@ -9,6 +9,7 @@ from splent_io.splent_feature_courses.models import (
     Course,
     Page,
     PageAttachment,
+    PageRevision,
 )
 from splent_framework.repositories.BaseRepository import BaseRepository
 from sqlalchemy import func
@@ -168,6 +169,75 @@ class PageRepository(BaseRepository):
         return query.order_by(Page.position, Page.id).all()
 
 
+    def search_all(
+        self, term: str = "", course_id: int | None = None, limit: int = 200
+    ) -> list[Page]:
+        """Every page in the wiki, filtered, newest edit first.
+
+        The back office needs a flat list because that is how a person
+        thinks of "the page about Vagrant" when they cannot remember which
+        year it is under, and drilling through fourteen courses to find one
+        page is the friction that makes staff stop editing.
+
+        The term matches the title only. Searching bodies from here would
+        duplicate the search feature badly: no index, no ranking, and a
+        LIKE over every body in the wiki on each keystroke.
+        """
+        query = Page.query.options(joinedload(Page.course), joinedload(Page.category))
+        if course_id:
+            query = query.filter(Page.course_id == course_id)
+        term = (term or "").strip()
+        if term:
+            query = query.filter(Page.name.ilike(f"%{term}%"))
+        touched = func.coalesce(Page.updated_at, Page.created_at)
+        return query.order_by(touched.desc(), Page.id.desc()).limit(limit).all()
+
+
+class PageRevisionRepository(BaseRepository):
+    """What a page said before each edit, newest first."""
+
+    def __init__(self):
+        super().__init__(PageRevision)
+
+    def list_for_page(self, page_id: int, limit: int | None = None) -> list[PageRevision]:
+        query = (
+            PageRevision.query.filter_by(page_id=page_id)
+            .order_by(PageRevision.created_at.desc(), PageRevision.id.desc())
+        )
+        return query.limit(limit).all() if limit else query.all()
+
+    def count_for_page(self, page_id: int) -> int:
+        return PageRevision.query.filter_by(page_id=page_id).count()
+
+    def get_for_page(self, page_id: int, revision_id: int) -> PageRevision | None:
+        """One revision, checked against the page it is asked for.
+
+        Both halves matter: a revision id on its own would let anybody who
+        can edit one page read the history of another by guessing numbers.
+        """
+        return PageRevision.query.filter_by(id=revision_id, page_id=page_id).first()
+
+    def trim_to(self, page_id: int, keep: int) -> int:
+        """Drop the oldest revisions past ``keep``. Returns how many went.
+
+        A page edited daily for a decade would otherwise carry three
+        thousand copies of itself, and nobody has ever asked to see the
+        four-hundredth. Kept generous, because the point of history is that
+        it is there when you did not expect to need it.
+        """
+        stale = (
+            PageRevision.query.filter_by(page_id=page_id)
+            .order_by(PageRevision.created_at.desc(), PageRevision.id.desc())
+            .offset(keep)
+            .all()
+        )
+        for revision in stale:
+            self.session.delete(revision)
+        if stale:
+            self.session.commit()
+        return len(stale)
+
+
 class PageAttachmentRepository(BaseRepository):
     def __init__(self):
         super().__init__(PageAttachment)
@@ -197,3 +267,43 @@ class PageAttachmentRepository(BaseRepository):
         separately, so attachment 1 and image 1 are different things.
         """
         return PageAttachment.query.filter_by(kind=kind, legacy_id=legacy_id).first()
+
+
+class WikiRepository:
+    """Questions about the wiki as a whole, rather than about one course.
+
+    Not a BaseRepository: it owns no model. It exists so the back-office
+    screens that look across everything have somewhere to live that is not
+    a route assembling queries by hand.
+    """
+
+    @staticmethod
+    def recent_revisions(limit: int = 100) -> list[PageRevision]:
+        """What has been edited lately, anywhere in the wiki."""
+        return (
+            PageRevision.query.options(
+                joinedload(PageRevision.page).joinedload(Page.course)
+            )
+            .order_by(PageRevision.created_at.desc(), PageRevision.id.desc())
+            .limit(limit)
+            .all()
+        )
+
+    @staticmethod
+    def all_attachments(
+        course_id: int | None = None, kind: str | None = None, limit: int = 300
+    ) -> list[PageAttachment]:
+        """Every file in the wiki, newest first.
+
+        Loaded with its page and course in one go: this list is the place a
+        person comes to find the file they uploaded to the wrong page, and
+        the answer is useless without saying which page that is.
+        """
+        query = PageAttachment.query.options(
+            joinedload(PageAttachment.page).joinedload(Page.course)
+        ).join(Page, PageAttachment.page_id == Page.id)
+        if course_id:
+            query = query.filter(Page.course_id == course_id)
+        if kind:
+            query = query.filter(PageAttachment.kind == kind)
+        return query.order_by(PageAttachment.id.desc()).limit(limit).all()

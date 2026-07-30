@@ -1,0 +1,99 @@
+{% extends "base_template.html" %}
+{% from "courses/admin/_form.html" import flashes, state_badge %}
+
+{% block title %}{{ _('Files') }}{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h3 mb-0">{{ _('Files') }}</h1>
+    <p class="text-muted mb-0">
+        {{ _('Everything attached anywhere in the wiki. A file is downloadable exactly when its page is readable.') }}
+    </p>
+</div>
+
+{{ flashes() }}
+
+<form method="GET" class="card mb-4">
+    <div class="card-body row g-2 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label" for="course">{{ _('Course') }}</label>
+            <select class="form-select" id="course" name="course">
+                <option value="">{{ _('All courses') }}</option>
+                {% for c in courses %}
+                <option value="{{ c.id }}" {{ 'selected' if course_id == c.id }}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="kind">{{ _('Kind') }}</label>
+            <select class="form-select" id="kind" name="kind">
+                <option value="">{{ _('Everything') }}</option>
+                {# The distinction staff care about: a document they listed
+                   under Files, against an image the body already shows. #}
+                <option value="file" {{ 'selected' if kind == 'file' }}>{{ _('Documents') }}</option>
+                <option value="inline" {{ 'selected' if kind == 'inline' }}>{{ _('Images in the text') }}</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">{{ _('Filter') }}</button>
+            {% if course_id or kind %}
+            <a href="{{ url_for('courses.admin_files') }}" class="btn btn-link text-muted">{{ _('Clear') }}</a>
+            {% endif %}
+        </div>
+    </div>
+</form>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>{{ _('File') }}</th>
+                    <th>{{ _('Page') }}</th>
+                    <th>{{ _('Course') }}</th>
+                    <th>{{ _('Readable') }}</th>
+                    <th class="text-end">{{ _('Actions') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attachment in attachments %}
+                <tr>
+                    <td>
+                        {{ attachment.name or _('Attachment') }}
+                        {% if attachment.kind == 'inline' %}
+                        <span class="badge bg-secondary">{{ _('in the text') }}</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="{{ url_for('courses.admin_page_edit', page_id=attachment.page_id) }}">{{ attachment.page.name }}</a></td>
+                    <td class="text-muted">{{ attachment.page.course.name }}</td>
+                    {# The page's state, because that is what decides whether
+                       this file answers or 404s. #}
+                    <td>{{ state_badge(attachment.page) }}</td>
+                    <td class="text-end">
+                        <a href="/media/file/{{ attachment.media_item_id }}" class="btn btn-sm btn-outline-secondary">{{ _('Open') }}</a>
+                        <form method="POST"
+                              action="{{ url_for('courses.admin_page_detach', attachment_id=attachment.id) }}"
+                              class="d-inline"
+                              onsubmit="return confirm('{{ _('Remove this file? The stored copy goes with it.') }}');">
+                            {{ confirm_form.hidden_tag() }}
+                            <input type="hidden" name="back" value="files">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">{{ _('Remove') }}</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-muted text-center py-4">
+                        {% if course_id or kind %}
+                        {{ _('No file matches that filter.') }}
+                        {% else %}
+                        {{ _('Nothing has been attached yet. Files are uploaded from a page.') }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

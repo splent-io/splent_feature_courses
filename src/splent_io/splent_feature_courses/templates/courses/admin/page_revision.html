@@ -1,0 +1,60 @@
+{% extends "base_template.html" %}
+{% from "courses/admin/_form.html" import flashes %}
+
+{% block title %}{{ _('Version of %(moment)s', moment=revision.created_at | course_datetime) }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-start gap-2 mb-4">
+    <div>
+        <h1 class="h3 mb-0">{{ _('Version of %(moment)s', moment=revision.created_at | course_datetime) }}</h1>
+        <p class="text-muted mb-0">
+            {{ page.name }} · {{ course.name }}
+            {% if revision.author_email %} · {{ revision.author_email }}{% endif %}
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('courses.admin_page_history', page_id=page.id) }}" class="btn btn-outline-secondary">{{ _('Back to the history') }}</a>
+        <a href="{{ url_for('courses.admin_page_edit', page_id=page.id) }}" class="btn btn-outline-secondary">{{ _('Back to the page') }}</a>
+        {# Restoring is a POST with a token, like every other change: a
+           GET that rewrote a page would be rewritten by a crawler. #}
+        <form method="POST"
+              action="{{ url_for('courses.admin_page_restore', page_id=page.id, revision_id=revision.id) }}"
+              onsubmit="return confirm('{{ _('Put this version back? What the page says now is kept in the history.') }}');">
+            {{ confirm_form.hidden_tag() }}
+            <button type="submit" class="btn btn-primary">{{ _('Restore this version') }}</button>
+        </form>
+    </div>
+</div>
+
+{{ flashes() }}
+
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>{{ _('What changed') }}</strong>
+        <div class="text-muted small">
+            {{ _('Lines removed since this version are marked in red, lines added in green.') }}
+        </div>
+    </div>
+    <div class="card-body p-0">
+        {% if diff %}
+        <div class="courses-diff">
+            {% for row in diff %}<div class="courses-diff__line courses-diff__line--{{ row.kind }}">{#
+                #}<span class="courses-diff__mark" aria-hidden="true">{% if row.kind == 'added' %}+{% elif row.kind == 'removed' %}-{% else %}&nbsp;{% endif %}</span>{#
+                #}<span class="courses-diff__text">{{ row.text }}</span>{#
+            #}</div>{% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted m-3">{{ _('The body is identical. Only the title changed.') }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><strong>{{ _('This version, as a reader would have seen it') }}</strong></div>
+    <div class="card-body">
+        {# Rendered by the same helper the public page uses, so what is being
+           judged here is the page and not an approximation of it. #}
+        <div class="cms-public site-main prose">{{ revision_html }}</div>
+    </div>
+</div>
+{% endblock %}

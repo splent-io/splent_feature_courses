@@ -141,3 +141,52 @@
     padding: .8rem 1rem;
     overflow-x: auto;
 }
+
+/* ── Comparing two versions ─────────────────────────────────────────────────
+   A diff is read by scanning the left edge, so the marker sits in its own
+   column and the text keeps a straight margin however long the line. Colour
+   is not the only signal: the + and - are real characters, so the screen
+   still reads without colour and in a printout. */
+.courses-diff {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .82rem;
+    line-height: 1.55;
+    overflow-x: auto;
+}
+
+.courses-diff__line {
+    display: flex;
+    gap: .5rem;
+    padding: .05rem .75rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border-inline-start: 3px solid transparent;
+}
+
+.courses-diff__mark {
+    flex: 0 0 auto;
+    width: 1ch;
+    opacity: .55;
+    user-select: none;
+}
+
+.courses-diff__text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.courses-diff__line--same {
+    color: #6b7280;
+}
+
+.courses-diff__line--removed {
+    background: #fdf0f0;
+    border-inline-start-color: #b31d28;
+    color: #7d1a22;
+}
+
+.courses-diff__line--added {
+    background: #eefbf1;
+    border-inline-start-color: #1a7f37;
+    color: #14532d;
+}

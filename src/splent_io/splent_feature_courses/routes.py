@@ -145,6 +145,35 @@ def _external_links_open_beside(default: bool = True) -> bool:
     return str(value).strip().lower() not in ("0", "false", "no", "off")
 
 
+def _diff_lines(before: str, after: str) -> list[dict]:
+    """The two versions lined up, so a person can see what moved.
+
+    difflib from the standard library rather than a dependency, and line by
+    line rather than word by word: prose is edited a paragraph at a time,
+    and a word-level diff of a rewritten paragraph is noise pretending to
+    be precision.
+
+    Each entry is {kind, text} with kind in {same, added, removed}. The
+    template decides how that looks; this only decides what changed.
+    """
+    import difflib
+
+    rows = []
+    matcher = difflib.SequenceMatcher(
+        None, before.splitlines(), after.splitlines(), autojunk=False
+    )
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            for line in before.splitlines()[i1:i2]:
+                rows.append({"kind": "same", "text": line})
+        else:
+            for line in before.splitlines()[i1:i2]:
+                rows.append({"kind": "removed", "text": line})
+            for line in after.splitlines()[j1:j2]:
+                rows.append({"kind": "added", "text": line})
+    return rows
+
+
 def _sections(course):
     """A course as it reads: each visible category with its visible pages."""
     return [
@@ -668,18 +697,191 @@ def admin_page_edit(page_id):
     if form.validate_on_submit():
         # The slug stays as it was for the same reason a course's does:
         # a document's URL is quoted in slides that will not be reissued.
-        courses_service.pages.update(
-            page.id,
-            category_id=form.category_id.data,
-            name=form.name.data.strip(),
+        # Through the service, because that is the one place that decides
+        # what goes into the history. A route writing the page directly
+        # would be an edit missing from it.
+        kept = courses_service.save_page(
+            page,
+            name=form.name.data,
             body_md=form.body_md.data or "",
+            author=current_user,
+            category_id=form.category_id.data,
             position=form.position.data or 0,
         )
         _apply_visibility(page, form)
-        flash(_("Saved %(name)s.", name=page.name), "success")
+        if kept:
+            flash(
+                _(
+                    "Saved %(name)s. The previous version is kept in the history.",
+                    name=page.name,
+                ),
+                "success",
+            )
+        else:
+            flash(_("Saved %(name)s.", name=page.name), "success")
         return redirect(url_for("courses.admin_page_edit", page_id=page.id))
 
     return _page_form(form, course, page)
+
+
+@courses_bp.route("/admin/courses/preview", methods=["POST"])
+@role_required(*STAFF_ROLES)
+def admin_preview():
+    """The body being typed, rendered exactly as a reader will be served it.
+
+    This is what makes the live preview honest. The editor's bundled
+    previewer renders markdown in the browser with its own library: no
+    Pygments, none of the plugins, a different sanitiser, so what it showed
+    was almost what would be published, and "almost" is what an editor
+    cannot check against. This endpoint runs the very same render_markdown
+    call as the public page, external-link policy included.
+
+    CSRF is validated from the header even though nothing here is stored:
+    the response is trusted markup put straight into the editor's DOM, and
+    an endpoint that renders attacker-supplied markdown on demand should
+    not be callable cross-site.
+    """
+    # Same CSRF policy as every form on this screen: enforced normally,
+    # skipped when the app's config turns it off, which is what the test
+    # configuration does for validate_on_submit too.
+    if current_app.config.get("WTF_CSRF_ENABLED", True):
+        from flask_wtf.csrf import validate_csrf
+
+        try:
+            validate_csrf(request.headers.get("X-CSRFToken", ""))
+        except Exception:
+            abort(400)
+    return render_markdown(
+        request.form.get("body_md") or "",
+        external_links_new_tab=_external_links_open_beside(),
+    )
+
+
+@courses_bp.route("/admin/courses/pages")
+@role_required(*STAFF_ROLES)
+def admin_pages():
+    """Every page in the wiki, flat, filtered, newest edit first.
+
+    The screen that was missing. Until now a page could only be reached by
+    remembering which of fourteen years it was under and clicking through,
+    which is the friction that makes staff stop editing.
+    """
+    term = (request.args.get("q") or "").strip()
+    course_id = request.args.get("course", type=int)
+    return render_template(
+        "courses/admin/pages.html",
+        pages=courses_service.pages.search_all(term=term, course_id=course_id),
+        courses=courses_service.visible_courses(current_user),
+        term=term,
+        course_id=course_id,
+    )
+
+
+@courses_bp.route("/admin/courses/activity")
+@role_required(*STAFF_ROLES)
+def admin_activity():
+    """What has been edited lately, anywhere in the wiki.
+
+    Two people preparing the same course in the same week is the ordinary
+    case here, and until now neither could see what the other had touched.
+    """
+    return render_template(
+        "courses/admin/activity.html",
+        revisions=courses_service.wiki.recent_revisions(),
+    )
+
+
+@courses_bp.route("/admin/courses/files")
+@role_required(*STAFF_ROLES)
+def admin_files():
+    """Every file in the wiki, with the page it hangs off.
+
+    Files inherit their page's visibility, so the state shown here is the
+    page's: a person asking "is this exam downloadable yet" is asking about
+    the page, and answering with the file's own row would be answering a
+    different question.
+    """
+    course_id = request.args.get("course", type=int)
+    kind = request.args.get("kind") or None
+    attachments = courses_service.wiki.all_attachments(
+        course_id=course_id, kind=kind
+    )
+    return render_template(
+        "courses/admin/files.html",
+        attachments=attachments,
+        courses=courses_service.visible_courses(current_user),
+        course_id=course_id,
+        kind=kind,
+        confirm_form=ConfirmForm(),
+    )
+
+
+@courses_bp.route("/admin/courses/pages/<int:page_id>/history")
+@role_required(*STAFF_ROLES)
+def admin_page_history(page_id):
+    """Every version this page has had, newest first."""
+    page = _page_or_404(page_id)
+    revisions = courses_service.page_history(page)
+    return render_template(
+        "courses/admin/page_history.html",
+        course=page.course,
+        page=page,
+        revisions=revisions,
+        confirm_form=ConfirmForm(),
+    )
+
+
+@courses_bp.route("/admin/courses/pages/<int:page_id>/history/<int:revision_id>")
+@role_required(*STAFF_ROLES)
+def admin_page_revision(page_id, revision_id):
+    """One old version, rendered, beside what the page says now.
+
+    Rendered rather than shown as markdown because the question a person
+    asks here is "what did the page look like", and reading a diff of
+    markdown to answer that is work the screen should have done.
+    """
+    page = _page_or_404(page_id)
+    revision = courses_service.revisions.get_for_page(page.id, revision_id)
+    if revision is None:
+        abort(404)
+    return render_template(
+        "courses/admin/page_revision.html",
+        course=page.course,
+        page=page,
+        revision=revision,
+        diff=_diff_lines(revision.body_md or "", page.body_md or ""),
+        revision_html=render_markdown(
+            revision.body_md or "",
+            external_links_new_tab=_external_links_open_beside(),
+        ),
+        confirm_form=ConfirmForm(),
+    )
+
+
+@courses_bp.route(
+    "/admin/courses/pages/<int:page_id>/history/<int:revision_id>/restore",
+    methods=["POST"],
+)
+@role_required(*STAFF_ROLES)
+def admin_page_restore(page_id, revision_id):
+    """Put an old version back. What the page says now is archived first."""
+    page = _page_or_404(page_id)
+    revision = courses_service.revisions.get_for_page(page.id, revision_id)
+    if revision is None:
+        abort(404)
+    form = ConfirmForm()
+    if not form.validate_on_submit():
+        abort(400)
+    courses_service.restore_revision(page, revision, author=current_user)
+    flash(
+        _(
+            "Restored the version from %(moment)s. What the page said before "
+            "is kept in the history.",
+            moment=_format_local(revision.created_at),
+        ),
+        "success",
+    )
+    return redirect(url_for("courses.admin_page_edit", page_id=page.id))
 
 
 @courses_bp.route("/admin/courses/pages/<int:page_id>/attach", methods=["POST"])
@@ -721,6 +923,12 @@ def admin_page_detach(attachment_id):
     page_id, name = attachment.page_id, attachment.name
     courses_service.detach_file(attachment)
     flash(_("Removed %(name)s.", name=name), "success")
+    # Back where the person was. An allowlist of this feature's own screens
+    # rather than a next= URL or the Referer header: both of those are an
+    # open redirect waiting to be found, and there are exactly two places
+    # a file can be removed from.
+    if request.form.get("back") == "files":
+        return redirect(url_for("courses.admin_files"))
     return redirect(url_for("courses.admin_page_edit", page_id=page_id))
 
 

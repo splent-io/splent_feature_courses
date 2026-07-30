@@ -190,13 +190,30 @@ def test_a_released_page_inside_a_withheld_course_stays_withheld(
     assert test_client.get(page_path).status_code == 404
 
 
-def test_search_does_not_reveal_a_withheld_page(test_client, test_app, material):
-    """The previous wiki leaked exactly here, through its search index."""
+def test_the_old_search_url_sends_readers_to_the_one_search_box(
+    test_client, test_app, material
+):
+    """Courses used to answer searches itself, over its own material only.
+
+    A product now has one box for everything, so this feature answers by
+    handing the reader over rather than keeping a second, narrower search
+    alive beside it: two boxes disagreeing about what exists is worse than
+    either. Old links and bookmarks still work, which is why the route is a
+    redirect and not a 404.
+
+    The guarantee this test used to make, that a withheld page never shows
+    up in results, did not move with the route: it was never the searching
+    that enforced it. Visibility is decided by this feature, at request time,
+    once per candidate, through the resolver it registers, and an index is
+    only ever allowed to propose. Pinned where that decision lives, in
+    splent_feature_search: test_a_stale_index_does_not_leak_a_withheld_title.
+    """
     later = datetime.now(timezone.utc) + timedelta(days=2)
     _withhold(test_app, Page, material["page_id"], publish_at=later)
 
     response = test_client.get(_path(test_app, "search"), query_string={"q": "Lab"})
-    assert response.status_code == 200
+
+    assert response.status_code == 302
     assert b"Lab 5" not in response.data
 
 

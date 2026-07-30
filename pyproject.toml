@@ -14,6 +14,7 @@ requires-python = ">=3.13"
 # result down to an allowlist, because "written by staff" is not the same
 # as "safe to mark as trusted HTML" once the source is an import.
 dependencies = [
+    "splent_framework>=1.9.0",
     "markdown-it-py[linkify]>=3.0",
     "mdit-py-plugins>=0.4",
     "nh3>=0.2",

@@ -8,9 +8,11 @@ from splent_framework.services.service_locator import register_service
 from splent_io.splent_feature_courses.services import (
     CoursesService,
     search_fetch,
+    search_current_scope,
     search_find,
     search_resolve,
     search_resolve_many,
+    search_scopes,
 )
 
 courses_bp = create_blueprint(__name__)
@@ -72,6 +74,8 @@ def init_feature(app):
         resolve=search_resolve,
         resolve_many=search_resolve_many,
         find=search_find,
+        scopes=search_scopes,
+        current_scope=search_current_scope,
         order=10,
     )
 

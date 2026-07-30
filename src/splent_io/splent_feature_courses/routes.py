@@ -14,6 +14,7 @@ CoursesService, which is the single place the rule lives.
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
 import nh3
@@ -35,7 +36,11 @@ from mdit_py_plugins.deflist import deflist_plugin
 from mdit_py_plugins.footnote import footnote_plugin
 from mdit_py_plugins.tasklists import tasklists_plugin
 
-from splent_io.splent_feature_courses import courses_bp
+from splent_io.splent_feature_courses import (
+    category_url,
+    course_url,
+    courses_bp,
+)
 from splent_io.splent_feature_courses.forms import (
     AttachmentForm,
     CategoryForm,
@@ -54,11 +59,6 @@ from splent_framework.decorators.decorators import role_required
 from splent_framework.services.service_locator import service_proxy
 
 courses_service = service_proxy("CoursesService")
-
-# The search scopes a reader can pick. "course" is only offered while
-# inside one; outside, the newest course is what a question is almost
-# always about.
-SEARCH_SCOPES = ("course", "newest", "all")
 
 
 # ── Markdown ─────────────────────────────────────────────────────────────
@@ -236,6 +236,29 @@ def _default_attachment_label(attachment) -> str:
 # ── Public screens ───────────────────────────────────────────────────────
 
 
+def _trail(course=None, category=None, page=None) -> list[dict]:
+    """Where the reader is, for the shell's breadcrumb.
+
+    A plain list of {"label", "url"}, which is all the theme asks for, so
+    this feature needs to import nothing to be placed in it. The last
+    entry is where they are and carries no link.
+
+    A page's category is included when it has one, because a reader who
+    landed from a search has not walked the hierarchy and the trail is the
+    only thing telling them what this page belongs to.
+    """
+    trail = [{"label": _("Courses"), "url": f"/{current_app.config['COURSES_PATH']}"}]
+    if course is not None:
+        trail.append({"label": course.name, "url": course_url(course)})
+    if category is not None:
+        trail.append({"label": category.name, "url": category_url(course, category)})
+    if page is not None:
+        trail.append({"label": page.name, "url": None})
+    if trail:
+        trail[-1] = {"label": trail[-1]["label"], "url": None}
+    return trail
+
+
 def course_index():
     """Every course the reader may see, newest first."""
     return render_template(
@@ -251,6 +274,7 @@ def course_detail(course_slug):
         course=course,
         sections=_sections(course),
         uncategorised=_uncategorised(course),
+        breadcrumb=_trail(course),
     )
 
 
@@ -264,6 +288,7 @@ def category_detail(course_slug, category_slug):
         course=course,
         category=category,
         pages=courses_service.visible_pages(category, current_user),
+        breadcrumb=_trail(course, category),
     )
 
 
@@ -278,45 +303,41 @@ def page_detail(course_slug, page_slug):
         page=page,
         body_html=render_markdown(page.body_md),
         attachments=_attachment_links(page),
+        breadcrumb=_trail(course, page.category, page),
     )
 
 
 def search():
-    """Matching pages, within the scope the reader chose.
+    """Where the old search page used to be.
 
-    The scope defaults to the course the reader came from, and to the
-    newest one they can see otherwise, because a question about the
-    subject is nearly always a question about this year.
+    This feature had its own box and its own results page, which meant two
+    search inputs on every screen once a search feature existed that serves
+    the whole product. One box won, the one in the header, and this URL
+    stays because it is in bookmarks and in links people sent each other.
+
+    The scope travels across: a reader who searched inside a course lands
+    on the same search, still inside that course.
     """
     term = (request.args.get("q") or "").strip()
     origin = courses_service.course_by_slug(request.args.get("course") or "")
     if not courses_service.course_visible(origin, current_user):
         origin = None
 
-    scope = request.args.get("scope") or ("course" if origin else "newest")
-    if scope not in SEARCH_SCOPES or (scope == "course" and origin is None):
-        scope = "newest"
-
-    if scope == "all":
-        target = None
-    elif scope == "course":
-        target = origin
-    else:
-        # The newest course this reader can see, which for staff is simply
-        # the newest one. Searching a course they cannot read would return
-        # nothing and look like the material had gone missing.
+    scope = request.args.get("scope") or ("course" if origin else "")
+    if scope == "course" and origin is not None:
+        target = origin.slug
+    elif scope == "newest":
         visible = courses_service.visible_courses(current_user)
-        target = visible[0] if visible else None
+        target = visible[0].slug if visible else ""
+    else:
+        # "all", anything unrecognised, or no scope at all: the whole site,
+        # which is what the search feature means by an empty scope.
+        target = ""
 
-    results = courses_service.search_pages(term, target, current_user) if term else []
-    return render_template(
-        "courses/search.html",
-        term=term,
-        scope=scope,
-        course=origin,
-        target=target,
-        results=results,
-    )
+    query = {"q": term} if term else {}
+    if target:
+        query["scope"] = target
+    return redirect(f"/{current_app.config['SEARCH_PATH']}?{urlencode(query)}")
 
 
 def register_public_routes(state):

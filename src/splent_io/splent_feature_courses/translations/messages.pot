@@ -1,0 +1,341 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-07-30 15:44+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: src/splent_io/splent_feature_courses/hooks.py:49
+#: src/splent_io/splent_feature_courses/routes.py:250
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:4
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:9
+#: src/splent_io/splent_feature_courses/templates/courses/hooks/admin_sidebar.html:5
+#: src/splent_io/splent_feature_courses/templates/courses/index.html:4
+#: src/splent_io/splent_feature_courses/templates/courses/index.html:7
+msgid "Courses"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:232
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:73
+msgid "Attachment"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:443
+msgid "No category"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:500
+#, python-format
+msgid "Created %(name)s."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:524
+#: src/splent_io/splent_feature_courses/routes.py:619
+#: src/splent_io/splent_feature_courses/routes.py:706
+#, python-format
+msgid "Saved %(name)s."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:551
+msgid "A name is required to copy a course."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:558
+#, python-format
+msgid "Copied into %(name)s."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:570
+#: src/splent_io/splent_feature_courses/routes.py:642
+#: src/splent_io/splent_feature_courses/routes.py:750
+#: src/splent_io/splent_feature_courses/routes.py:762
+#, python-format
+msgid "Removed %(name)s."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:594
+#: src/splent_io/splent_feature_courses/routes.py:675
+#, python-format
+msgid "Added %(name)s."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:724
+msgid "Choose a file to upload."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:731
+msgid "That file could not be stored."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/routes.py:733
+#, python-format
+msgid "Attached %(name)s."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:10
+#: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:12
+msgid "Not visible to readers yet"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:10
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:46
+#, python-format
+msgid "Withheld until %(moment)s"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:12
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:48
+msgid "Withheld"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/category.html:23
+#: src/splent_io/splent_feature_courses/templates/courses/course.html:30
+msgid "Nothing here yet."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/category.html:27
+#, python-format
+msgid "Back to %(course)s"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:22
+#: src/splent_io/splent_feature_courses/templates/courses/course.html:7
+msgid "Course"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/course.html:35
+msgid "This course has no material published yet."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/course.html:40
+msgid "Other material"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/course.html:52
+msgid "All courses"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/index.html:8
+msgid "Every academic year, newest first."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/index.html:23
+msgid "There is nothing published here yet."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/page.html:15
+msgid "Breadcrumb"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:65
+#: src/splent_io/splent_feature_courses/templates/courses/page.html:30
+msgid "Files"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:27
+msgid "Visibility"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:31
+msgid "Withheld from readers until you clear this, whatever the date below says."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:36
+#, python-format
+msgid ""
+"Local time in %(timezone)s. Leave it empty to release as soon as it is "
+"not hidden."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:44
+msgid "Visible"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:56
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:81
+msgid "Remove"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/category_form.html:4
+#: src/splent_io/splent_feature_courses/templates/courses/admin/category_form.html:9
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:44
+msgid "New section"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/category_form.html:12
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:13
+msgid "Back to the course"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/category_form.html:22
+msgid "Sections are ordered by hand, lowest first."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/category_form.html:24
+msgid ""
+"Withholding a section withholds every page in it, whatever those pages "
+"say on their own."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/category_form.html:27
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:35
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:56
+msgid "Cancel"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:4
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:8
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:12
+msgid "New course"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:9
+msgid "Back to courses"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:28
+msgid ""
+"Leave this on until the year is ready. You can schedule it once it has "
+"material."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:31
+msgid ""
+"One section per line. These are the divisions of the course, such as "
+"theory and lab work."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:42
+msgid "Contents"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:45
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:61
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:4
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:9
+msgid "New page"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:56
+msgid "Everything in this section is withheld with it."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:63
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:79
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:112
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:37
+msgid "Edit"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:65
+msgid "Remove this section and its pages?"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:81
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:114
+msgid "Remove this page?"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:85
+msgid "No pages in this section yet."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:92
+msgid "This course has no sections yet."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:98
+msgid "Outside any section"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/course_form.html:99
+msgid ""
+"These pages are reachable but are listed on their own. Give them a "
+"section to file them."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:10
+msgid ""
+"One course per academic year. Each one is a snapshot: editing this year "
+"never changes what an earlier one shows."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:23
+msgid "Readers see it"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:24
+msgid "Actions"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:36
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:15
+msgid "View"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:39
+msgid "Copy"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:41
+msgid "Remove this course and everything in it?"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:56
+msgid "Name of the new course"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:57
+msgid "Everything is copied withheld, so nothing is released before you say so."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:59
+msgid "Copy course"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:65
+msgid "No courses yet."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:37
+msgid "Markdown. Tables, footnotes and existing HTML are all kept."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:44
+msgid "Preview"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:66
+msgid ""
+"Attachments inherit this page. They are refused until it is released, to "
+"a link that was forwarded exactly as to a guess."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:75
+msgid "Open"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:79
+msgid "Remove this file? The stored copy goes with it."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:86
+msgid "No files attached to this page."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:103
+msgid "Optional, defaults to the file name"
+msgstr ""
+

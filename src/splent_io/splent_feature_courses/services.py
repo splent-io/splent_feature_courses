@@ -503,6 +503,13 @@ def search_fetch():
             "url": _page_url(page),
             "course": page.course.name,
             "category": page.category.name if page.category is not None else "",
+            # Which course this page belongs to, so a reader standing in one
+            # can narrow a search to it. A location and not a permission: it
+            # says nothing about who may read the page, which is still asked
+            # per request. Without it a narrowed search matches nothing at
+            # all, and the box would answer "no results" for a course the
+            # reader is looking at.
+            "scope": page.course.slug,
         }
 
 
@@ -568,7 +575,7 @@ def search_resolve_many(doc_ids, user=None) -> dict:
     return resolved
 
 
-def search_find(term: str, user=None) -> list[dict]:
+def search_find(term: str, user=None, scope: str | None = None) -> list[dict]:
     """Matching pages for a product with no engine, or one that is down.
 
     Exactly search_pages, presented the way the registry expects. Written
@@ -576,6 +583,52 @@ def search_find(term: str, user=None) -> list[dict]:
     filtered visibility its own way would be the one place the rule could
     drift, and it would drift silently, because the fallback only runs
     when the engine is unreachable.
+
+    A scope is a course slug. One nobody recognises finds nothing rather
+    than quietly widening to everything, which is the difference between a
+    typo showing no results and a typo showing the whole site.
     """
     service = CoursesService()
-    return [_page_result(page, term) for page in service.search_pages(term, user=user)]
+    course = None
+    if scope:
+        course = service.course_by_slug(scope)
+        if course is None:
+            return []
+    return [
+        _page_result(page, term)
+        for page in service.search_pages(term, course, user=user)
+    ]
+
+
+def search_scopes(user=None) -> list[dict]:
+    """The courses this reader may narrow a search to, newest first.
+
+    Only what they can already see: offering a course that answers 404 on
+    arrival would confirm it exists.
+    """
+    return [
+        {"key": course.slug, "label": course.name}
+        for course in CoursesService().visible_courses(user)
+    ]
+
+
+def search_current_scope() -> str | None:
+    """The course the reader is looking at, or nothing.
+
+    Read here rather than by a search feature, which does not know that
+    /cursos/<slug> means a course and must never learn it: these URLs are
+    this feature's, built from its own configuration, and free to change
+    without anything else noticing.
+    """
+    from flask import has_request_context, request
+
+    if not has_request_context():
+        return None
+    path = (current_app.config.get("COURSES_PATH") or "").strip("/")
+    if not path:
+        return None
+    parts = [part for part in request.path.split("/") if part]
+    if len(parts) < 2 or parts[0] != path:
+        return None
+    slug = parts[1]
+    return slug if CoursesService().course_by_slug(slug) is not None else None

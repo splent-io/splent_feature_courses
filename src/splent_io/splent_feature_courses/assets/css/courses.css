@@ -57,34 +57,6 @@
 
 /* ── Breadcrumbs ─────────────────────────────────────────────────────── */
 
-.courses-breadcrumb {
-    font-size: .875rem;
-    color: var(--brand-muted);
-    margin-bottom: 1rem;
-    /* Wraps rather than scrolls: three levels of Spanish titles do not fit
-     * on a narrow screen and a hidden trail is a lost reader. */
-    display: flex;
-    flex-wrap: wrap;
-    gap: .35rem;
-    align-items: center;
-    list-style: none;
-    padding: 0;
-}
-
-.courses-breadcrumb a {
-    color: var(--brand-muted);
-}
-
-.courses-breadcrumb a:hover {
-    color: var(--brand-primary);
-}
-
-.courses-breadcrumb li + li::before {
-    content: "/";
-    margin-right: .35rem;
-    color: var(--brand-border);
-}
-
 /* ── Categories and their pages ──────────────────────────────────────── */
 
 .courses-section {

@@ -17,7 +17,6 @@ from datetime import datetime, timezone
 from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
 
-import nh3
 from flask import (
     abort,
     current_app,
@@ -29,12 +28,8 @@ from flask import (
 )
 from flask_babel import gettext as _
 from flask_login import current_user
-from markdown_it import MarkdownIt
-from markupsafe import Markup
-from mdit_py_plugins.anchors import anchors_plugin
-from mdit_py_plugins.deflist import deflist_plugin
-from mdit_py_plugins.footnote import footnote_plugin
-from mdit_py_plugins.tasklists import tasklists_plugin
+
+from splent_framework.markdown import render_markdown
 
 from splent_io.splent_feature_courses import (
     category_url,
@@ -61,68 +56,11 @@ from splent_framework.services.service_locator import service_proxy
 courses_service = service_proxy("CoursesService")
 
 
-# ── Markdown ─────────────────────────────────────────────────────────────
-
-
-def _build_renderer() -> MarkdownIt:
-    """The markdown dialect the stored bodies are written in.
-
-    markdown-it-py with the GFM preset, because the material being
-    migrated is GitHub-flavoured markdown: tables, strikethrough and bare
-    URLs already appear in it and a stricter CommonMark reader would show
-    them as literal text. Raw HTML is enabled for the same reason, the old
-    wiki's bodies contain it, and is made safe afterwards rather than
-    dropped, which would silently lose content.
-
-    The plugins are the four that the material actually uses: heading
-    anchors so a long practical can be linked to by section, definition
-    lists, footnotes and task lists.
-    """
-    return (
-        MarkdownIt("gfm-like", {"html": True, "linkify": True, "typographer": False})
-        .use(anchors_plugin, max_level=4)
-        .use(deflist_plugin)
-        .use(footnote_plugin)
-        .use(tasklists_plugin)
-    )
-
-
-_MARKDOWN = _build_renderer()
-
-# The allowlist the rendered HTML is cut down to. Built from nh3's own
-# list rather than from scratch, so the day an element turns out to be
-# dangerous the library takes it away here too.
-_ALLOWED_TAGS = set(nh3.ALLOWED_TAGS) | {"input"}
-_ALLOWED_ATTRIBUTES = {tag: set(attrs) for tag, attrs in nh3.ALLOWED_ATTRIBUTES.items()}
-# id carries the heading anchors, class carries both the plugins' own
-# markup and whatever the migrated bodies were styled with. Neither can
-# execute anything.
-_ALLOWED_ATTRIBUTES["*"] = _ALLOWED_ATTRIBUTES.get("*", set()) | {"id", "class"}
-_ALLOWED_ATTRIBUTES["input"] = {"checked", "disabled"}
-# A task list checkbox is the only input a body may contain; anything
-# else would be a form pointing somewhere of the author's choosing.
-_ALLOWED_INPUT_VALUES = {"input": {"type": {"checkbox"}}}
-_ALLOWED_URL_SCHEMES = {"http", "https", "mailto"}
-
-
-def render_markdown(body_md: str) -> Markup:
-    """A stored body as HTML a reader can be shown.
-
-    Rendered here rather than in the template because the sanitising step
-    is not optional: a body is written by staff but was migrated from a
-    wiki anyone with an account could edit, and marking it safe without
-    cleaning it would run whatever it happens to contain.
-    """
-    html = _MARKDOWN.render(body_md or "")
-    return Markup(
-        nh3.clean(
-            html,
-            tags=_ALLOWED_TAGS,
-            attributes=_ALLOWED_ATTRIBUTES,
-            tag_attribute_values=_ALLOWED_INPUT_VALUES,
-            url_schemes=_ALLOWED_URL_SCHEMES,
-        )
-    )
+# The dialect, the code highlighting and the allowlist a stored body is cut
+# down to all live in splent_framework.markdown now. They were here,
+# privately, which meant the next feature to hold written material would
+# either copy them or do without, and what would have been copied is a
+# security decision rather than a convenience.
 
 
 # ── Release moments ──────────────────────────────────────────────────────

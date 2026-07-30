@@ -12,13 +12,10 @@
 <div class="container section">
 
 
-    <nav class="courses-breadcrumb" aria-label="{{ _('Breadcrumb') }}">
-        <a href="{{ course_url(course) }}">{{ course.name }}</a>
-        {% if page.category %}
-        <span aria-hidden="true">/</span>
-        <a href="{{ category_url(course, page.category) }}">{{ page.category.name }}</a>
-        {% endif %}
-    </nav>
+    {# No trail here. The shell draws one, from the breadcrumb this view
+       passes it, and it says the same thing one line higher up. Two of them
+       on one page is not twice as helpful: a reader who sees the second one
+       reads it as a different navigation and looks for the difference. #}
 
     <p class="card__meta">{{ withheld_badge(page) }}</p>
 

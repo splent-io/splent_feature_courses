@@ -7,6 +7,8 @@ Exposed under the ``feature:courses`` group, e.g.::
     splent feature:courses status
     splent feature:courses publish egc-2026-2027/tema-1
     splent feature:courses hide egc-2026-2027/examen
+    splent feature:courses import-bookstack --source-url ... --uploads ...
+    splent feature:courses verify-bookstack --source-url ... --uploads ...
 
 They run inside the active product's Flask app context, so they reach the
 product database through the same service the web pages use and can never
@@ -19,6 +21,7 @@ exam is still withheld.
 
 from __future__ import annotations
 
+import os
 import re
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -640,4 +643,229 @@ def hide(reference, kind):
     click.echo()
 
 
-cli_commands = [new_course, copy_course, status, publish, hide]
+@click.command("import-bookstack")
+@click.option(
+    "--source-url",
+    required=True,
+    help="SQLAlchemy URL of the BookStack database, for example "
+    "mysql+pymysql://user:password@host/bookstack.",
+)
+@click.option(
+    "--uploads",
+    required=True,
+    help="Directory holding BookStack's uploads, extracted from its backup.",
+)
+@click.option(
+    "--app-url",
+    default=None,
+    help="Address the source wiki served itself at. Detected from its own "
+    "bodies when not given.",
+)
+@click.option(
+    "--reset-visibility",
+    is_flag=True,
+    help="Take the source's answer about what is withheld again, overwriting "
+    "any release made here since the last import.",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Read everything and report, write nothing.",
+)
+def import_bookstack(source_url, uploads, app_url, reset_visibility, dry_run):
+    """Copy a BookStack wiki into this product's courses.
+
+    A book becomes a course, a chapter a category and a page a page, with
+    the slugs kept, so a link written years ago in a slide or an e-mail
+    still resolves. Documents and embedded images become restricted files
+    that inherit the visibility of the page they belong to, and every
+    reference in the bodies is repointed at them.
+
+    The source is a database, not the REST API, because a migration that
+    matters is run from the dump taken at the cutover. Prepare it once:
+
+    \b
+        gzcat db.sql.gz | mysql -h HOST -u USER -p bookstack_src
+        mkdir -p /srv/bookstack_uploads
+        tar -xzf uploads.tar.gz -C /srv/bookstack_uploads
+
+    Then run this. It is safe to run again: every row is matched by what
+    identifies it in the source, so a rehearsal costs nothing and the run
+    on the day updates what it already wrote. What is withheld is taken
+    from the source only when a row is created, so re-running never undoes
+    a release made here.
+    """
+    from splent_io.splent_feature_courses.bookstack import (
+        BookStackImport,
+        BookStackSource,
+    )
+
+    if not os.path.isdir(uploads):
+        click.echo()
+        click.secho(f"  There is no directory at {uploads}.", fg="red")
+        click.echo(
+            "  It should be BookStack's uploads, extracted from its backup: "
+            "the folder holding images/ and files/."
+        )
+        click.echo()
+        raise SystemExit(1)
+
+    try:
+        source = BookStackSource(source_url)
+    except Exception as error:  # noqa: BLE001 - reported, not swallowed
+        click.echo()
+        click.secho(f"  Could not read the source: {error}", fg="red")
+        click.echo()
+        raise SystemExit(1) from error
+
+    job = BookStackImport(
+        source,
+        uploads_root=uploads,
+        app_url=app_url,
+        reset_visibility=reset_visibility,
+        dry_run=dry_run,
+    )
+
+    click.echo()
+    click.echo(f"  source   {source.url.rsplit('@', 1)[-1]}")
+    click.echo(f"  uploads  {uploads}")
+    click.echo(f"  old URL  {job.app_url or '(none found, links left alone)'}")
+    if dry_run:
+        click.secho("  dry run, nothing will be written.", fg="yellow")
+    click.echo()
+
+    report = job.run()
+
+    for label in ("courses", "categories", "pages", "file", "inline", "covers"):
+        created = report.created.get(label, 0)
+        updated = report.updated.get(label, 0)
+        reused = report.reused.get(label, 0)
+        if not (created or updated or reused):
+            continue
+        name = {"file": "documents", "inline": "images"}.get(label, label)
+        parts = []
+        if created:
+            parts.append(f"{created} new")
+        if updated:
+            parts.append(f"{updated} updated")
+        if reused:
+            parts.append(f"{reused} already here")
+        click.echo(f"  {name:11} {', '.join(parts)}")
+
+    if report.rewritten_links:
+        click.echo()
+        for label, count in sorted(report.rewritten_links.items()):
+            click.echo(f"  repointed  {count} {label}")
+
+    click.echo()
+    if report.problems:
+        click.secho(f"  {len(report.problems)} thing(s) need a look:", fg="yellow")
+        for problem in report.problems[:40]:
+            click.echo(f"    {problem}")
+        if len(report.problems) > 40:
+            click.echo(f"    ... and {len(report.problems) - 40} more")
+        click.echo()
+        click.echo(
+            "  Nothing was dropped; the references above were left as they were."
+        )
+    else:
+        click.secho("  Everything resolved.", fg="green")
+    click.echo()
+
+
+@click.command("verify-bookstack")
+@click.option(
+    "--source-url",
+    required=True,
+    help="SQLAlchemy URL of the BookStack database the import read.",
+)
+@click.option(
+    "--uploads",
+    required=True,
+    help="Directory holding BookStack's uploads, the one the import read.",
+)
+@click.option(
+    "--app-url",
+    default=None,
+    help="Address the source wiki served itself at. Detected when not given.",
+)
+@click.option(
+    "--show",
+    default=25,
+    show_default=True,
+    help="How many findings to print per severity.",
+)
+def verify_bookstack(source_url, uploads, app_url, show):
+    """Check an import against the wiki it came from.
+
+    An import that reports success has only said it did not crash. This
+    reads both sides and asks whether the material arrived: the same shape,
+    bodies intact down to the code blocks, files present and the same size
+    on disk, links still resolving, and a student seeing exactly what a
+    student saw before.
+
+    Exits non-zero if anything FAILED, so it can gate a cutover.
+    """
+    from splent_io.splent_feature_courses.bookstack import BookStackSource
+    from splent_io.splent_feature_courses.bookstack_verify import (
+        FAIL,
+        INFO,
+        WARN,
+        BookStackVerification,
+    )
+
+    if not os.path.isdir(uploads):
+        click.echo()
+        click.secho(f"  There is no directory at {uploads}.", fg="red")
+        click.echo()
+        raise SystemExit(1)
+
+    try:
+        source = BookStackSource(source_url)
+    except Exception as error:  # noqa: BLE001 - reported, not swallowed
+        click.echo()
+        click.secho(f"  Could not read the source: {error}", fg="red")
+        click.echo()
+        raise SystemExit(1) from error
+
+    click.echo()
+    click.echo("  Reading both sides...")
+    report = BookStackVerification(source, uploads, app_url).run()
+    click.echo()
+
+    colours = {FAIL: "red", WARN: "yellow", INFO: "bright_black"}
+    for severity in (FAIL, WARN, INFO):
+        findings = [f for f in report.findings if f.severity == severity]
+        if not findings:
+            continue
+        click.secho(f"  {severity}  {len(findings)}", fg=colours[severity], bold=True)
+        for finding in findings[:show]:
+            click.echo(f"    {finding.course:22} {finding.check:12} {finding.detail}")
+        if len(findings) > show:
+            click.echo(f"    ... and {len(findings) - show} more")
+        click.echo()
+
+    if report.failed:
+        click.secho("  Not faithful yet:", fg="red", bold=True)
+        for check, count in report.by_check(FAIL):
+            click.echo(f"    {check:12} {count}")
+        click.echo()
+        raise SystemExit(1)
+
+    click.secho(
+        "  Faithful. Every course, page, file and link checked out, and a "
+        "student sees exactly what they saw before.",
+        fg="green",
+    )
+    click.echo()
+
+
+cli_commands = [
+    new_course,
+    copy_course,
+    status,
+    publish,
+    hide,
+    import_bookstack,
+    verify_bookstack,
+]

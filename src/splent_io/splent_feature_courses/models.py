@@ -160,6 +160,12 @@ class Page(db.Model, VisibilityMixin):
         return f"Page<{self.id}:{self.slug}>"
 
 
+#: A file the reader downloads, listed under the page.
+KIND_FILE = "file"
+#: An image the body embeds, which is not a document and is never listed.
+KIND_INLINE = "inline"
+
+
 class PageAttachment(db.Model):
     """A file belonging to a page, which inherits the page's visibility.
 
@@ -167,6 +173,12 @@ class PageAttachment(db.Model):
     what tells the access resolver which page decides whether they may be
     served. An unreleased script has to answer 404 to anyone who guesses
     its URL, and that requirement is why files cannot be served statically.
+
+    An embedded image is the same arrangement wearing a different hat. It is
+    material too, so a diagram of an unreleased lab must not be reachable by
+    guessing its URL either, but it is not a document and listing it under
+    "Files" would be wrong. ``kind`` is that difference and nothing more:
+    the access resolver treats both identically.
     """
 
     __tablename__ = "course_page_attachment"
@@ -181,6 +193,13 @@ class PageAttachment(db.Model):
     media_item_id = db.Column(db.Integer, nullable=False, index=True)
     name = db.Column(db.String(255), default="")
     position = db.Column(db.Integer, default=0, nullable=False)
+    kind = db.Column(
+        db.String(16), default=KIND_FILE, server_default=KIND_FILE, nullable=False
+    )
+    # The identifier the source wiki gave this, so a body written against
+    # the old URLs can be rewritten and re-running an import updates the
+    # same row instead of adding another. Ids are only unique within a
+    # kind: a file and an image can both be number 1 in their own table.
     legacy_id = db.Column(db.Integer, nullable=True, index=True)
 
     page = db.relationship("Page", back_populates="attachments")

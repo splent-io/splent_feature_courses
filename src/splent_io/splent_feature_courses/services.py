@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from flask import current_app
 
 from splent_io.splent_feature_courses.models import (
+    KIND_FILE,
     Category,
     Course,
     Page,
@@ -313,13 +314,24 @@ class CoursesService(BaseService):
         db.session.commit()
         return item
 
-    def attach_file(self, page: Page, file_storage, name: str = ""):
+    def attach_file(
+        self,
+        page: Page,
+        file_storage,
+        name: str = "",
+        kind: str = KIND_FILE,
+        legacy_id: int | None = None,
+    ):
         """Store an uploaded file as this page's, withheld with it.
 
         The bytes go to the media library as a restricted item owned by
         this feature, so serving them asks page_visible first. That is what
         makes an unreleased script answer 404 to a guessed URL rather than
         merely being unlinked.
+
+        ``kind`` says whether this is a document the reader downloads or an
+        image the body embeds. Both are gated the same way; only the first
+        is listed under the page.
         """
         from splent_framework.services.service_locator import get_service_class
 
@@ -338,7 +350,9 @@ class CoursesService(BaseService):
             page_id=page.id,
             media_item_id=item.id,
             name=name or item.filename,
-            position=len(self.attachments.list_for_page(page.id)),
+            kind=kind,
+            legacy_id=legacy_id,
+            position=len(self.attachments.list_for_page(page.id, kind=kind)),
         )
         db.session.add(attachment)
         db.session.commit()

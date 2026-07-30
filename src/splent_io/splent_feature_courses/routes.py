@@ -760,9 +760,10 @@ def _page_form(form, course, page):
         preview_html=preview_html,
         attachment_form=AttachmentForm(),
         confirm_form=ConfirmForm(),
-        # The full list, not the reader's view: staff manage the files of a
-        # page that is still withheld, which is the normal case while next
-        # week's session is being prepared.
+        # The full list of files, not the reader's view: staff manage the
+        # files of a page that is still withheld, which is the normal case
+        # while next week's session is being prepared. Embedded images are
+        # not files and are managed from the body that references them.
         attachments=(
             courses_service.attachments.list_for_page(page.id) if page else []
         ),

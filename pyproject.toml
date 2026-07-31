@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "splent_feature_courses"
-version = "0.5.0"
+version = "0.6.0"
 readme = "README.md"
 requires-python = ">=3.13"
 
@@ -42,11 +42,11 @@ description = "courses feature"
 archetype = "full"
 
 [tool.splent.contract.provides]
-routes     = ["/", "/<COURSES_PATH>", "/<COURSES_PATH>/<course_slug>", "/<COURSES_PATH>/<course_slug>/<COURSES_CATEGORY_SEGMENT>/<category_slug>", "/<COURSES_PATH>/<course_slug>/<COURSES_PAGE_SEGMENT>/<page_slug>", "/<COURSES_PATH>/search", "/admin/courses", "/admin/courses/<int:course_id>/categories/new", "/admin/courses/<int:course_id>/copy", "/admin/courses/<int:course_id>/delete", "/admin/courses/<int:course_id>/edit", "/admin/courses/<int:course_id>/pages/new", "/admin/courses/attachments/<int:attachment_id>/detach", "/admin/courses/categories/<int:category_id>/delete", "/admin/courses/categories/<int:category_id>/edit", "/admin/courses/new", "/admin/courses/pages/<int:page_id>/attach", "/admin/courses/pages/<int:page_id>/delete", "/admin/courses/pages/<int:page_id>/edit"]
+routes     = ["/", "/<COURSES_PATH>", "/<COURSES_PATH>/<course_slug>", "/<COURSES_PATH>/<course_slug>/<COURSES_CATEGORY_SEGMENT>/<category_slug>", "/<COURSES_PATH>/<course_slug>/<COURSES_PAGE_SEGMENT>/<page_slug>", "/<COURSES_PATH>/search", "/admin/courses", "/admin/courses/<int:course_id>/categories/new", "/admin/courses/<int:course_id>/copy", "/admin/courses/<int:course_id>/delete", "/admin/courses/<int:course_id>/edit", "/admin/courses/<int:course_id>/pages/new", "/admin/courses/activity", "/admin/courses/attachments/<int:attachment_id>/detach", "/admin/courses/categories/<int:category_id>/delete", "/admin/courses/categories/<int:category_id>/edit", "/admin/courses/files", "/admin/courses/new", "/admin/courses/pages", "/admin/courses/pages/<int:page_id>/attach", "/admin/courses/pages/<int:page_id>/delete", "/admin/courses/pages/<int:page_id>/edit", "/admin/courses/pages/<int:page_id>/history", "/admin/courses/pages/<int:page_id>/history/<int:revision_id>", "/admin/courses/pages/<int:page_id>/history/<int:revision_id>/restore", "/admin/courses/preview"]
 routes_manual = ["/", "/<COURSES_PATH>", "/<COURSES_PATH>/<course_slug>", "/<COURSES_PATH>/<course_slug>/<COURSES_CATEGORY_SEGMENT>/<category_slug>", "/<COURSES_PATH>/<course_slug>/<COURSES_PAGE_SEGMENT>/<page_slug>", "/<COURSES_PATH>/search"]
 blueprints = []
-models     = ["Category", "Course", "Page", "PageAttachment"]
-commands   = ["copy-course", "hide", "import-bookstack", "new-course", "publish", "status", "verify-bookstack"]
+models     = ["Category", "Course", "Page", "PageAttachment", "PageRevision"]
+commands   = ["copy-course", "hide", "import-bookstack", "new-course", "publish", "repair-links", "status", "verify-bookstack"]
 hooks      = ["layout.authenticated_sidebar", "layout.head.css", "layout.scripts"]
 services   = ["CoursesService"]
 signals    = []
@@ -61,7 +61,7 @@ signals  = []
 
 [tool.splent.contract.extensible]
 services  = ["CoursesService"]
-templates = ["courses/admin/category_form.html", "courses/admin/course_form.html", "courses/admin/courses.html", "courses/admin/page_form.html", "courses/category.html", "courses/course.html", "courses/hooks/admin_sidebar.html", "courses/index.html", "courses/page.html"]
-models    = ["Category", "Course", "Page", "PageAttachment"]
+templates = ["courses/admin/activity.html", "courses/admin/category_form.html", "courses/admin/course_form.html", "courses/admin/courses.html", "courses/admin/files.html", "courses/admin/page_form.html", "courses/admin/page_history.html", "courses/admin/page_revision.html", "courses/admin/pages.html", "courses/category.html", "courses/course.html", "courses/hooks/admin_sidebar.html", "courses/index.html", "courses/page.html"]
+models    = ["Category", "Course", "Page", "PageAttachment", "PageRevision"]
 hooks     = ["layout.authenticated_sidebar", "layout.head.css", "layout.scripts"]
 routes    = false

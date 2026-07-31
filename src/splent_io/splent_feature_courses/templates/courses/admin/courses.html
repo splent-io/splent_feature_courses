@@ -1,5 +1,5 @@
 {% extends "base_template.html" %}
-{% from "courses/admin/_form.html" import flashes, state_badge, delete_button %}
+{% from "courses/admin/_form.html" import flashes, state_badge, delete_button with context %}
 
 {% block title %}{{ _('Courses') }}{% endblock %}
 

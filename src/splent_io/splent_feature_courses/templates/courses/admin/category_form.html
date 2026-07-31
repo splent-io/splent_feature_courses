@@ -1,5 +1,5 @@
 {% extends "base_template.html" %}
-{% from "courses/admin/_form.html" import field, flashes, visibility %}
+{% from "courses/admin/_form.html" import field, flashes, visibility with context %}
 
 {% block title %}{{ category.name if category else _('New section') }}{% endblock %}
 

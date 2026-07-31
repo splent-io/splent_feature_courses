@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-30 22:53+0000\n"
+"POT-Creation-Date: 2026-07-31 00:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,100 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+
+#: src/splent_io/splent_feature_courses/forms.py:47
+#: src/splent_io/splent_feature_courses/forms.py:66
+msgid "Hidden"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:49
+msgid "Publish at"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:63
+#: src/splent_io/splent_feature_courses/forms.py:78
+#: src/splent_io/splent_feature_courses/forms.py:95
+msgid "Name"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:64
+#: src/splent_io/splent_feature_courses/forms.py:79
+msgid "Description"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:65
+msgid "Categories"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:67
+msgid "Create course"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:80
+msgid "Save course"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:87
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:56
+msgid "Name of the new course"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:89
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:59
+msgid "Copy course"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:96
+#: src/splent_io/splent_feature_courses/forms.py:114
+msgid "Position"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:97
+msgid "Save category"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:109
+msgid "Title"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:111
+msgid "Category"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:113
+msgid "Body"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:115
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:47
+msgid "Preview"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:116
+msgid "Save page"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:129
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:51
+msgid "File"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:130
+#: src/splent_io/splent_feature_courses/routes.py:899
+msgid "Choose a file to upload."
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:132
+msgid "Display name"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:133
+msgid "Attach file"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/forms.py:139
+msgid "Confirm"
+msgstr ""
 
 #: src/splent_io/splent_feature_courses/hooks.py:30
 #: src/splent_io/splent_feature_courses/routes.py:242
@@ -108,10 +202,6 @@ msgid ""
 "in the history."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/routes.py:899
-msgid "Choose a file to upload."
-msgstr ""
-
 #: src/splent_io/splent_feature_courses/routes.py:906
 msgid "That file could not be stored."
 msgstr ""
@@ -135,13 +225,13 @@ msgid "Not visible to readers yet"
 msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:10
-#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:46
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:56
 #, python-format
 msgid "Withheld until %(moment)s"
 msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:12
-#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:48
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:62
 msgid "Withheld"
 msgstr ""
 
@@ -202,11 +292,16 @@ msgid ""
 "not hidden."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:44
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:54
 msgid "Visible"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:56
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:60
+#, python-format
+msgid "Held back by %(name)s"
+msgstr ""
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:70
 #: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:80
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:84
 msgid "Remove"
@@ -377,16 +472,8 @@ msgstr ""
 msgid "Remove this course and everything in it?"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:56
-msgid "Name of the new course"
-msgstr ""
-
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:57
 msgid "Everything is copied withheld, so nothing is released before you say so."
-msgstr ""
-
-#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:59
-msgid "Copy course"
 msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:65
@@ -425,10 +512,6 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:51
-msgid "File"
-msgstr ""
-
 #: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:54
 msgid "Readable"
 msgstr ""
@@ -463,10 +546,6 @@ msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:40
 msgid "Markdown. Tables, footnotes and existing HTML are all kept."
-msgstr ""
-
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:47
-msgid "Preview"
 msgstr ""
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:69

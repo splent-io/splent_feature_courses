@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-07-30 22:53+0000\n"
+"POT-Creation-Date: 2026-07-31 00:24+0000\n"
 "PO-Revision-Date: 2026-07-30 12:00+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -17,6 +17,100 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+
+#: src/splent_io/splent_feature_courses/forms.py:47
+#: src/splent_io/splent_feature_courses/forms.py:66
+msgid "Hidden"
+msgstr "Oculto"
+
+#: src/splent_io/splent_feature_courses/forms.py:49
+msgid "Publish at"
+msgstr "Publicar el"
+
+#: src/splent_io/splent_feature_courses/forms.py:63
+#: src/splent_io/splent_feature_courses/forms.py:78
+#: src/splent_io/splent_feature_courses/forms.py:95
+msgid "Name"
+msgstr "Nombre"
+
+#: src/splent_io/splent_feature_courses/forms.py:64
+#: src/splent_io/splent_feature_courses/forms.py:79
+msgid "Description"
+msgstr "Descripción"
+
+#: src/splent_io/splent_feature_courses/forms.py:65
+msgid "Categories"
+msgstr "Categorías"
+
+#: src/splent_io/splent_feature_courses/forms.py:67
+msgid "Create course"
+msgstr "Crear el curso"
+
+#: src/splent_io/splent_feature_courses/forms.py:80
+msgid "Save course"
+msgstr "Guardar el curso"
+
+#: src/splent_io/splent_feature_courses/forms.py:87
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:56
+msgid "Name of the new course"
+msgstr "Nombre del curso nuevo"
+
+#: src/splent_io/splent_feature_courses/forms.py:89
+#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:59
+msgid "Copy course"
+msgstr "Copiar curso"
+
+#: src/splent_io/splent_feature_courses/forms.py:96
+#: src/splent_io/splent_feature_courses/forms.py:114
+msgid "Position"
+msgstr "Posición"
+
+#: src/splent_io/splent_feature_courses/forms.py:97
+msgid "Save category"
+msgstr "Guardar la sección"
+
+#: src/splent_io/splent_feature_courses/forms.py:109
+msgid "Title"
+msgstr "Título"
+
+#: src/splent_io/splent_feature_courses/forms.py:111
+msgid "Category"
+msgstr "Sección"
+
+#: src/splent_io/splent_feature_courses/forms.py:113
+msgid "Body"
+msgstr "Contenido"
+
+#: src/splent_io/splent_feature_courses/forms.py:115
+#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:47
+msgid "Preview"
+msgstr "Vista previa"
+
+#: src/splent_io/splent_feature_courses/forms.py:116
+msgid "Save page"
+msgstr "Guardar la página"
+
+#: src/splent_io/splent_feature_courses/forms.py:129
+#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:51
+msgid "File"
+msgstr "Archivo"
+
+#: src/splent_io/splent_feature_courses/forms.py:130
+#: src/splent_io/splent_feature_courses/routes.py:899
+msgid "Choose a file to upload."
+msgstr "Elige un fichero para subir."
+
+#: src/splent_io/splent_feature_courses/forms.py:132
+msgid "Display name"
+msgstr "Nombre visible"
+
+#: src/splent_io/splent_feature_courses/forms.py:133
+msgid "Attach file"
+msgstr "Adjuntar el archivo"
+
+#: src/splent_io/splent_feature_courses/forms.py:139
+msgid "Confirm"
+msgstr "Confirmar"
 
 #: src/splent_io/splent_feature_courses/hooks.py:30
 #: src/splent_io/splent_feature_courses/routes.py:242
@@ -107,11 +201,9 @@ msgstr "Se ha guardado %(name)s. La versión anterior queda en el historial."
 msgid ""
 "Restored the version from %(moment)s. What the page said before is kept "
 "in the history."
-msgstr "Restaurada la versión del %(moment)s. Lo que decía antes queda en el historial."
-
-#: src/splent_io/splent_feature_courses/routes.py:899
-msgid "Choose a file to upload."
-msgstr "Elige un fichero para subir."
+msgstr ""
+"Restaurada la versión del %(moment)s. Lo que decía antes queda en el "
+"historial."
 
 #: src/splent_io/splent_feature_courses/routes.py:906
 msgid "That file could not be stored."
@@ -136,13 +228,13 @@ msgid "Not visible to readers yet"
 msgstr "Todavía no visible para los lectores"
 
 #: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:10
-#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:46
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:56
 #, python-format
 msgid "Withheld until %(moment)s"
 msgstr "Oculto hasta el %(moment)s"
 
 #: src/splent_io/splent_feature_courses/templates/courses/_visibility.html:12
-#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:48
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:62
 msgid "Withheld"
 msgstr "Retenido"
 
@@ -195,9 +287,6 @@ msgstr "Visibilidad"
 #: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:31
 msgid "Withheld from readers until you clear this, whatever the date below says."
 msgstr "Oculto para los lectores hasta que lo desmarques, diga lo que diga la fecha de abajo."
-"Oculto para los lectores hasta que lo desmarques, diga lo que diga la "
-"fecha de abajo.Retenido para los lectores hasta que desmarques esto, diga"
-" lo que diga la fecha de abajo."
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:36
 #, python-format
@@ -206,11 +295,16 @@ msgid ""
 "not hidden."
 msgstr ""
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:44
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:54
 msgid "Visible"
 msgstr "Visible"
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:56
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:60
+#, python-format
+msgid "Held back by %(name)s"
+msgstr "Retenido por %(name)s"
+
+#: src/splent_io/splent_feature_courses/templates/courses/admin/_form.html:70
 #: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:80
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:84
 msgid "Remove"
@@ -220,7 +314,9 @@ msgstr "Eliminar"
 msgid ""
 "Recent edits across the whole wiki. Each row is what a page said before "
 "that save."
-msgstr "Ediciones recientes de toda la wiki. Cada fila es lo que decía una página antes de ese guardado."
+msgstr ""
+"Ediciones recientes de toda la wiki. Cada fila es lo que decía una página"
+" antes de ese guardado."
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/activity.html:19
 msgid "When"
@@ -391,17 +487,9 @@ msgstr "Copiar"
 msgid "Remove this course and everything in it?"
 msgstr "¿Eliminar este curso y todo lo que contiene?"
 
-#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:56
-msgid "Name of the new course"
-msgstr "Nombre del curso nuevo"
-
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:57
 msgid "Everything is copied withheld, so nothing is released before you say so."
 msgstr "Se copia todo retenido, así que no se publica nada hasta que tú lo digas."
-
-#: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:59
-msgid "Copy course"
-msgstr "Copiar curso"
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/courses.html:65
 msgid "No courses yet."
@@ -411,7 +499,9 @@ msgstr "Todavía no hay cursos."
 msgid ""
 "Everything attached anywhere in the wiki. A file is downloadable exactly "
 "when its page is readable."
-msgstr "Todo lo adjuntado en cualquier punto de la wiki. Un archivo se puede descargar exactamente cuando su página se puede leer."
+msgstr ""
+"Todo lo adjuntado en cualquier punto de la wiki. Un archivo se puede "
+"descargar exactamente cuando su página se puede leer."
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:28
 msgid "Kind"
@@ -438,10 +528,6 @@ msgstr "Filtrar"
 #: src/splent_io/splent_feature_courses/templates/courses/admin/pages.html:34
 msgid "Clear"
 msgstr "Quitar filtros"
-
-#: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:51
-msgid "File"
-msgstr "Archivo"
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/files.html:54
 msgid "Readable"
@@ -478,13 +564,6 @@ msgstr "Historial"
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:40
 msgid "Markdown. Tables, footnotes and existing HTML are all kept."
 msgstr "Markdown. Se conservan las tablas, las notas al pie y el HTML que ya hubiera."
-"Markdown. Se conservan las tablas, las notas al pie y el HTML que ya "
-"hubiera.Markdown. Se conservan las tablas, las notas al pie y el HTML que"
-" ya hubiera."
-
-#: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:47
-msgid "Preview"
-msgstr "Vista previa"
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_form.html:69
 msgid ""
@@ -520,7 +599,9 @@ msgstr "Versiones anteriores"
 msgid ""
 "Each entry is what the page said before that edit. The newest is at the "
 "top."
-msgstr "Cada entrada es lo que decía la página antes de esa edición. La más reciente, arriba."
+msgstr ""
+"Cada entrada es lo que decía la página antes de esa edición. La más "
+"reciente, arriba."
 
 #: src/splent_io/splent_feature_courses/templates/courses/admin/page_history.html:30
 msgid "Saved over"
@@ -608,7 +689,9 @@ msgstr "Todavía no hay ninguna página."
 msgid ""
 "Showing the 200 most recently edited. Narrow the filter to see further "
 "back."
-msgstr "Se muestran las 200 editadas más recientemente. Afina el filtro para ver más atrás."
+msgstr ""
+"Se muestran las 200 editadas más recientemente. Afina el filtro para ver "
+"más atrás."
 
 #~ msgid "Breadcrumb"
 #~ msgstr "Ruta de navegación"

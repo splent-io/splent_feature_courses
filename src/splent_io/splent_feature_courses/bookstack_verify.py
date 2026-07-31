@@ -25,6 +25,7 @@ from dataclasses import dataclass, field
 from flask import current_app
 
 from splent_io.splent_feature_courses.models import KIND_FILE, KIND_INLINE
+from splent_io.splent_feature_courses.html_body import body_of
 from splent_io.splent_feature_courses.services import CoursesService
 
 FAIL = "FAIL"
@@ -174,7 +175,11 @@ class BookStackVerification:
         return matched
 
     def _check_body(self, course_slug: str, row: dict, page) -> None:
-        source = row["markdown"] or ""
+        # The same reading the import does, and for the same reason: a page
+        # written in BookStack's visual editor has no markdown at all, and
+        # comparing against that column alone declared eleven full pages
+        # empty on both sides and called the migration faithful.
+        source, _ = body_of(row)
         target = page.body_md or ""
 
         if source.strip() and not target.strip():

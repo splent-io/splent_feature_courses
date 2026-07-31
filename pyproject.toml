@@ -65,3 +65,23 @@ templates = ["courses/admin/activity.html", "courses/admin/category_form.html", 
 models    = ["Category", "Course", "Page", "PageAttachment", "PageRevision"]
 hooks     = ["layout.authenticated_sidebar", "layout.head.css", "layout.scripts"]
 routes    = false
+
+# ── Configuration ─────────────────────────────────────────────────────────
+# What this feature reads from the environment, and what it falls back to.
+# A product overrides any of these in its own [tool.splent.config]; it does
+# not copy them.
+[tool.splent.config]
+# The words the material is served under. Spanish by default because that
+# is what the products of this line are taught in, and a URL is read by
+# students far more often than it is typed by staff.
+COURSES_PATH = "cursos"
+COURSES_CATEGORY_SEGMENT = "categoria"
+COURSES_PAGE_SEGMENT = "pagina"
+# How a new academic year is named and described. Empty here because only
+# a product knows what its subject is called.
+COURSES_NAME_PREFIX = ""
+COURSES_DESCRIPTION_TEMPLATE = ""
+COURSES_DEFAULT_CATEGORIES = ""
+# The zone staff type release dates in. Getting this wrong publishes
+# material an hour early twice a year.
+COURSES_TIMEZONE = "Europe/Madrid"

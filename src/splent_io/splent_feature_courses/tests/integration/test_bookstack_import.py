@@ -14,6 +14,7 @@ from splent_io.splent_feature_courses.bookstack import BookStackImport
 from splent_io.splent_feature_courses.models import (
     KIND_FILE,
     KIND_INLINE,
+    Course,
 )
 from splent_io.splent_feature_courses.services import CoursesService
 
@@ -33,6 +34,7 @@ class FakeSource:
         images=None,
         covers=None,
         hidden=None,
+        unowned=None,
         app_url="http://localhost:8080",
     ):
         self._books = books or []
@@ -42,6 +44,7 @@ class FakeSource:
         self._images = images or []
         self._covers = covers or {}
         self._hidden = hidden or set()
+        self._unowned = unowned or []
         self._app_url = app_url
 
     def books(self):
@@ -58,6 +61,9 @@ class FakeSource:
 
     def gallery_images(self):
         return self._images
+
+    def unowned_gallery_images(self):
+        return self._unowned
 
     def book_covers(self):
         return self._covers
@@ -402,6 +408,149 @@ class TestDryRun:
         assert report.problems == []
         assert report.rewritten_links["attachments"] == 1
         assert report.rewritten_links["images"] == 1
+
+
+class TestAnImageNobodyOwns:
+    """A gallery image whose page pointer is null, still named by a body.
+
+    BookStack keeps a row per uploaded image pointing at the page it was
+    uploaded to, and a page that was rewritten, moved or purged can leave
+    that pointer null while another page goes on naming the file. The join
+    that reads the gallery drops those rows, so the reference resolved to
+    nothing and the reader got a broken image with the bytes sitting in the
+    backup all along: the first screenshot of an eight step install guide
+    arrived that way, and the other seven did not.
+    """
+
+    def test_the_page_that_names_it_gets_it(self, test_client, test_app, uploads):
+        source = FakeSource(
+            books=[_book()],
+            chapters=[_chapter()],
+            pages=[
+                _page(
+                    markdown="![captura](/uploads/images/gallery/2026-07/diagram.png)"
+                )
+            ],
+            unowned=[
+                {
+                    "id": 7,
+                    "name": "diagram.png",
+                    "path": "/uploads/images/gallery/2026-07/diagram.png",
+                    "page_id": None,
+                }
+            ],
+        )
+
+        report = _run(source, uploads, test_app)
+
+        assert report.problems == []
+        with test_app.app_context():
+            page = CoursesService().pages.get_by_slug(
+                Course.query.filter_by(slug="egc-20252026").first().id, "lab-5"
+            )
+            assert "/media/file/" in page.body_md
+            assert "/uploads/images/" not in page.body_md
+
+    def test_one_nobody_names_is_left_alone(self, test_client, test_app, uploads):
+        """It is not material, it is a leftover row. Importing it would put
+        a file under Files that no page ever showed."""
+        source = FakeSource(
+            books=[_book()],
+            chapters=[_chapter()],
+            pages=[_page(markdown="sin imagenes")],
+            unowned=[
+                {
+                    "id": 7,
+                    "name": "diagram.png",
+                    "path": "/uploads/images/gallery/2026-07/diagram.png",
+                    "page_id": None,
+                }
+            ],
+        )
+
+        report = _run(source, uploads, test_app)
+
+        assert report.created["inline"] == 0
+        assert report.problems == []
+
+    def test_one_whose_bytes_are_gone_is_still_reported(
+        self, test_client, test_app, uploads
+    ):
+        """Adopting it must not turn a missing file into silence."""
+        source = FakeSource(
+            books=[_book()],
+            chapters=[_chapter()],
+            pages=[_page(markdown="![x](/uploads/images/gallery/2026-07/nowhere.png)")],
+            unowned=[
+                {
+                    "id": 7,
+                    "name": "nowhere.png",
+                    "path": "/uploads/images/gallery/2026-07/nowhere.png",
+                    "page_id": None,
+                }
+            ],
+        )
+
+        report = _run(source, uploads, test_app)
+
+        assert any("nowhere.png" in problem for problem in report.problems)
+
+
+class TestAPageWrittenInTheVisualEditor:
+    """BookStack's default editor stores prose as HTML and leaves the
+    markdown column empty, so reading only markdown imports the page blank
+    and calls it empty in the source."""
+
+    def test_its_prose_arrives(self, test_client, test_app, uploads):
+        source = FakeSource(
+            books=[_book()],
+            chapters=[_chapter()],
+            pages=[
+                _page(
+                    markdown="",
+                    html="<h2>Requisitos</h2><p>Python <strong>3.13</strong></p>",
+                    editor="wysiwyg",
+                )
+            ],
+        )
+
+        report = _run(source, uploads, test_app)
+
+        assert report.problems == []
+        assert report.converted_pages == 1
+        with test_app.app_context():
+            page = CoursesService().pages.get_by_slug(
+                Course.query.filter_by(slug="egc-20252026").first().id, "lab-5"
+            )
+            assert "## Requisitos" in page.body_md
+            assert "**3.13**" in page.body_md
+
+    def test_it_is_not_reported_as_empty(self, test_client, test_app, uploads):
+        """The old message read as a fact about the source rather than as a
+        failure to read it, which is why eleven full pages looked unwritten."""
+        source = FakeSource(
+            books=[_book()],
+            chapters=[_chapter()],
+            pages=[_page(markdown="", html="<p>hay texto</p>", editor="wysiwyg")],
+        )
+
+        report = _run(source, uploads, test_app)
+
+        assert not any("empty body" in problem for problem in report.problems)
+
+    def test_a_page_with_neither_is_still_reported(
+        self, test_client, test_app, uploads
+    ):
+        source = FakeSource(
+            books=[_book()],
+            chapters=[_chapter()],
+            pages=[_page(markdown="", html="", editor="wysiwyg")],
+        )
+
+        report = _run(source, uploads, test_app)
+
+        assert any("empty body" in problem for problem in report.problems)
+        assert report.converted_pages == 0
 
 
 class TestMissingFiles:

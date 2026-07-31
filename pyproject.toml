@@ -18,6 +18,9 @@ dependencies = [
     "markdown-it-py[linkify]>=3.0",
     "mdit-py-plugins>=0.4",
     "nh3>=0.2",
+    # Reading a BookStack whose authors used the visual editor, which is the
+    # one it ships as the default. Those pages have no markdown at all.
+    "markdownify>=0.13",
 ]
 
 [tool.setuptools]

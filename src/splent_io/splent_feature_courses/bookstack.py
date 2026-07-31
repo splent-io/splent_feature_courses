@@ -48,6 +48,7 @@ from splent_io.splent_feature_courses.models import (
     Course,
     Page,
 )
+from splent_io.splent_feature_courses.html_body import body_of
 from splent_io.splent_feature_courses.services import CoursesService
 
 
@@ -169,6 +170,28 @@ class BookStackSource:
             """
         )
 
+    def unowned_gallery_images(self) -> list[dict]:
+        """Gallery images belonging to no live page.
+
+        BookStack keeps a row per uploaded image and normally points it at
+        the page it was uploaded to, but a page that was rewritten, moved or
+        purged can leave that pointer null while another page still names
+        the file in its body. The join in gallery_images drops those, and
+        the reference then has nothing to resolve to: the first screenshot
+        of an eight step install guide came across as a broken image for
+        exactly this reason, with the bytes sitting in the backup all along.
+        """
+        return self._rows(
+            """
+            SELECT i.id, i.name, i.path, NULL AS page_id
+            FROM images i
+            LEFT JOIN entities p ON p.id = i.uploaded_to
+                                AND p.type = 'page' AND p.deleted_at IS NULL
+            WHERE i.type = 'gallery' AND p.id IS NULL
+            ORDER BY i.id
+            """
+        )
+
     def book_covers(self) -> dict[int, dict]:
         """The cover image of each live book, by book id."""
         rows = self._rows(
@@ -243,6 +266,11 @@ class ImportReport:
     updated: Counter = field(default_factory=Counter)
     reused: Counter = field(default_factory=Counter)
     rewritten_links: Counter = field(default_factory=Counter)
+    # Pages whose prose only existed as HTML, because they were written in
+    # the visual editor. Counted rather than listed: on a wiki whose authors
+    # never switched editors this is every page, and a line each would bury
+    # the problems underneath.
+    converted_pages: int = 0
     problems: list[str] = field(default_factory=list)
 
     def problem(self, message: str) -> None:
@@ -285,6 +313,8 @@ class BookStackImport:
         # stored under, so a body can be rewritten to point at the copy.
         self._media: dict[tuple[str, int], int] = {}
         self._image_paths: dict[str, int] = {}
+        # Filled during the file import, read during the rewrite.
+        self._unowned_images: dict[str, dict] = {}
 
     # -- entry point -------------------------------------------------------
 
@@ -371,8 +401,11 @@ class BookStackImport:
             page.position = row["priority"] or 0
             page.legacy_id = row["id"]
             # The body is written here as it came, and rewritten once the
-            # files it references exist and have addresses.
-            page.body_md = row["markdown"] or ""
+            # files it references exist and have addresses. A page written
+            # in the visual editor has no markdown at all and its prose
+            # lives in the html column, so that is converted rather than
+            # imported as a blank page.
+            page.body_md, converted = body_of(row)
             if row.get("created_at"):
                 page.created_at = row["created_at"]
             if row.get("updated_at"):
@@ -385,7 +418,9 @@ class BookStackImport:
             self.report.created["pages"] += 1 if creating else 0
             self.report.updated["pages"] += 0 if creating else 1
 
-            if not (row["markdown"] or "").strip():
+            if converted:
+                self.report.converted_pages += 1
+            elif not page.body_md.strip():
                 self.report.problem(
                     f"page '{row['slug']}' in '{course.slug}' has an empty body "
                     "in the source"
@@ -404,6 +439,13 @@ class BookStackImport:
             )
             if media_id is not None:
                 self._image_paths[self._normalise_path(row["path"])] = media_id
+        # Held rather than imported: an image with no owner only becomes
+        # material when a page turns out to name it, and that is known
+        # during the rewrite below.
+        self._unowned_images = {
+            self._normalise_path(row["path"]): row
+            for row in self.source.unowned_gallery_images()
+        }
 
     def _import_one(self, row: dict, kind: str, label: str) -> int | None:
         page = self._pages.get(row["page_id"])
@@ -571,6 +613,8 @@ class BookStackImport:
             def replace_image(match, page=page):
                 media_id = self._resolve_image(match.group(1))
                 if media_id is None:
+                    media_id = self._adopt_unowned_image(match.group(1), page)
+                if media_id is None:
                     self.report.problem(
                         f"page '{page.slug}': image {match.group(1)}, which the "
                         "source does not have"
@@ -632,6 +676,26 @@ class BookStackImport:
                 prefixes.append(f"/{value}/")
         alternatives = "|".join(re.escape(prefix) for prefix in prefixes)
         return re.compile(f"{re.escape(self.app_url)}(?=(?:{alternatives}))")
+
+    def _adopt_unowned_image(self, path: str, page) -> int | None:
+        """Give an ownerless image to the page that names it.
+
+        The source lost track of which page it belonged to, and the page
+        asking for it is the best answer available and the only one that
+        matters to a reader.
+        """
+        row = self._unowned_images.get(self._normalise_path(path))
+        if row is None:
+            return None
+
+        media_id = self._import_one(
+            {**row, "page_id": page.legacy_id},
+            kind=KIND_INLINE,
+            label=f"image {row['id']} ({row['name']})",
+        )
+        if media_id is not None:
+            self._image_paths[self._normalise_path(row["path"])] = media_id
+        return media_id
 
     def _resolve_image(self, path: str) -> int | None:
         """The media item for an image path, thumbnails included.

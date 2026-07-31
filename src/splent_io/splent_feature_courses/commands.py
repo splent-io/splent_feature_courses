@@ -767,6 +767,13 @@ def import_bookstack(source_url, uploads, app_url, reset_visibility, dry_run):
             parts.append(f"{reused} already here")
         click.echo(f"  {name:11} {', '.join(parts)}")
 
+    if report.converted_pages:
+        click.echo()
+        click.echo(
+            f"  converted  {report.converted_pages} page(s) written in the "
+            "visual editor, which store their prose as HTML"
+        )
+
     if report.rewritten_links:
         click.echo()
         for label, count in sorted(report.rewritten_links.items()):

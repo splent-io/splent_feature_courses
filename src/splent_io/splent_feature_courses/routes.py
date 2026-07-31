@@ -826,9 +826,7 @@ def admin_files():
     """
     course_id = request.args.get("course", type=int)
     kind = request.args.get("kind") or None
-    attachments = courses_service.wiki.all_attachments(
-        course_id=course_id, kind=kind
-    )
+    attachments = courses_service.wiki.all_attachments(course_id=course_id, kind=kind)
     return render_template(
         "courses/admin/files.html",
         attachments=attachments,

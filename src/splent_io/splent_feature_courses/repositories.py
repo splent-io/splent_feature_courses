@@ -168,7 +168,6 @@ class PageRepository(BaseRepository):
             query = query.filter(Page.course_id == course_id)
         return query.order_by(Page.position, Page.id).all()
 
-
     def search_all(
         self, term: str = "", course_id: int | None = None, limit: int = 200
     ) -> list[Page]:
@@ -199,10 +198,11 @@ class PageRevisionRepository(BaseRepository):
     def __init__(self):
         super().__init__(PageRevision)
 
-    def list_for_page(self, page_id: int, limit: int | None = None) -> list[PageRevision]:
-        query = (
-            PageRevision.query.filter_by(page_id=page_id)
-            .order_by(PageRevision.created_at.desc(), PageRevision.id.desc())
+    def list_for_page(
+        self, page_id: int, limit: int | None = None
+    ) -> list[PageRevision]:
+        query = PageRevision.query.filter_by(page_id=page_id).order_by(
+            PageRevision.created_at.desc(), PageRevision.id.desc()
         )
         return query.limit(limit).all() if limit else query.all()
 

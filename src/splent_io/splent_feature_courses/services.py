@@ -170,7 +170,6 @@ class CoursesService(BaseService):
                 break
         return recent
 
-
     def visibility_state(self, item, now=None) -> dict:
         """What a reader would actually experience, for the admin badge.
 

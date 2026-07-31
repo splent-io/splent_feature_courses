@@ -29,7 +29,12 @@ ADMIN_PATH = "/admin/courses"
 ADMIN_SECTION = (
     ("courses.admin_index", ADMIN_PATH, lambda: _("Courses"), "book-open"),
     ("courses.admin_pages", ADMIN_PATH + "/pages", lambda: _("Pages"), "file-text"),
-    ("courses.admin_activity", ADMIN_PATH + "/activity", lambda: _("Activity"), "clock"),
+    (
+        "courses.admin_activity",
+        ADMIN_PATH + "/activity",
+        lambda: _("Activity"),
+        "clock",
+    ),
     ("courses.admin_files", ADMIN_PATH + "/files", lambda: _("Files"), "paperclip"),
 )
 

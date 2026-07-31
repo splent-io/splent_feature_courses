@@ -288,7 +288,5 @@ def test_the_live_preview_renders_exactly_what_a_reader_gets(
 def test_the_preview_is_not_for_readers(test_client, test_app, material):
     """It renders arbitrary markdown on demand, so it belongs to the people
     who can already write pages and to nobody else."""
-    response = test_client.post(
-        "/admin/courses/preview", data={"body_md": "# x"}
-    )
+    response = test_client.post("/admin/courses/preview", data={"body_md": "# x"})
     assert response.status_code in (302, 401, 403)

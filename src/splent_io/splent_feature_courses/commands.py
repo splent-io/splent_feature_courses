@@ -927,7 +927,9 @@ def repair_links(do_apply):
         # Reported, never invented: a reference to a file nobody migrated is
         # a missing file, and making up a URL turns a visible problem into
         # an invisible one.
-        click.secho(f"  {missing} reference(s) point at nothing and were left", fg="yellow")
+        click.secho(
+            f"  {missing} reference(s) point at nothing and were left", fg="yellow"
+        )
     if not do_apply and repaired:
         click.echo(click.style("  Re-run with --apply to write them.", bold=True))
     click.echo()

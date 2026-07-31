@@ -860,6 +860,79 @@ def verify_bookstack(source_url, uploads, app_url, show):
     click.echo()
 
 
+@click.command("repair-links")
+@click.option(
+    "--apply",
+    "do_apply",
+    is_flag=True,
+    help="Write the changes. Without it nothing is saved and the report is "
+    "the same, which is how you check before committing to it.",
+)
+def repair_links(do_apply):
+    """Point migrated bodies at the files that came with them.
+
+    The import brought every attachment across and rewrote most references,
+    but some kept the shape the old wiki wrote them in: an image whose
+    target is a bare filename. A relative target resolves against the
+    page's own URL, so a reader gets a broken image where a set of slides
+    should be.
+
+    Nothing is missing. Each name is matched against an attachment of the
+    very page that references it, never across the wiki, because two
+    courses can each have their own diagrama.png and guessing between them
+    would quietly show the wrong year's material.
+
+    PDFs come out as download links and pictures stay pictures, since a set
+    of slides rendered as an image is a broken icon either way.
+    """
+    from splent_framework.db import db
+    from splent_io.splent_feature_courses.models import Page
+    from splent_io.splent_feature_courses.repair import repair_body, unresolved
+
+    click.echo()
+    click.echo(
+        click.style("  repair-links  ", bold=True)
+        + ("writing" if do_apply else "dry run, nothing will be saved")
+    )
+    click.echo()
+
+    repaired = missing = pages = 0
+    for page in db.session.query(Page).all():
+        body, changes = repair_body(page.body_md or "", page.attachments)
+        gaps = unresolved(page.body_md or "", page.attachments)
+
+        if changes:
+            pages += 1
+            repaired += len(changes)
+            click.echo(f"  {page.course.slug}/{page.slug}")
+            for target, url in changes:
+                click.echo(click.style(f"      {target} -> {url}", dim=True))
+            if do_apply:
+                page.body_md = body
+
+        for gap in gaps:
+            missing += 1
+            click.secho(
+                f"  {page.course.slug}/{page.slug}: no file named {gap!r} on "
+                f"this page, left as it is",
+                fg="yellow",
+            )
+
+    if do_apply and repaired:
+        db.session.commit()
+
+    click.echo()
+    click.echo(f"  {repaired} reference(s) on {pages} page(s)")
+    if missing:
+        # Reported, never invented: a reference to a file nobody migrated is
+        # a missing file, and making up a URL turns a visible problem into
+        # an invisible one.
+        click.secho(f"  {missing} reference(s) point at nothing and were left", fg="yellow")
+    if not do_apply and repaired:
+        click.echo(click.style("  Re-run with --apply to write them.", bold=True))
+    click.echo()
+
+
 cli_commands = [
     new_course,
     copy_course,
@@ -868,4 +941,5 @@ cli_commands = [
     hide,
     import_bookstack,
     verify_bookstack,
+    repair_links,
 ]

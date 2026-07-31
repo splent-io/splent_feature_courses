@@ -33,6 +33,62 @@ def _may_read(item, user) -> bool:
 
 
 def init_feature(app):
+    # What a new academic year is called and what it starts with. These are
+    # revisited every September, by whoever teaches the subject rather than
+    # by whoever deploys it, so they belong in the panel.
+    #
+    # The URL segments are not here. They are read when the routes are built
+    # and a value typed at runtime would appear to do nothing, besides
+    # breaking every link already written down if it did.
+    from splent_framework.settings.settings_schema import register_settings
+
+    register_settings(
+        "courses",
+        "Courses",
+        [
+            {
+                "key": "name_prefix",
+                "env": "COURSES_NAME_PREFIX",
+                "type": "text",
+                "default": "",
+                "label": "Name a new year starts with",
+                "help": (
+                    "Put in front of the year, so EGC gives EGC 2025/2026. "
+                    "A prefix containing {year} is used as the whole name."
+                ),
+            },
+            {
+                "key": "description_template",
+                "env": "COURSES_DESCRIPTION_TEMPLATE",
+                "type": "text",
+                "default": "",
+                "label": "Description of a new year",
+                "help": "Accepts {year}, {start}, {end} and {short}.",
+            },
+            {
+                "key": "default_categories",
+                "env": "COURSES_DEFAULT_CATEGORIES",
+                "type": "text",
+                "default": "",
+                "label": "Sections a new year starts with",
+                "help": "Comma separated. Empty starts an empty year.",
+            },
+            {
+                "key": "timezone",
+                "env": "COURSES_TIMEZONE",
+                "type": "text",
+                "default": "Europe/Madrid",
+                "label": "Timezone for release dates",
+                "help": (
+                    "Moments are stored in UTC. This is the clock staff "
+                    "type them in, so a lab at 08:00 means 08:00 where the "
+                    "subject is taught."
+                ),
+            },
+        ],
+        icon="book-open",
+    )
+
     from splent_framework.assets.asset_registry import register_asset
 
     register_service(app, "CoursesService", CoursesService)

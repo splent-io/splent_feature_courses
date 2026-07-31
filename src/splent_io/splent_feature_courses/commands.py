@@ -27,7 +27,6 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import click
-from flask import current_app
 
 from splent_io.splent_feature_courses.services import local_timezone
 from splent_framework.services.service_locator import service_proxy
@@ -98,6 +97,17 @@ def _fill(template: str, year: str, config_key: str) -> str:
         ) from exc
 
 
+def _setting(key):
+    """A courses setting, from the admin panel and then the environment.
+
+    Read through the resolver rather than from app.config, so a name typed
+    into the panel is the one a new year is created with.
+    """
+    from splent_framework.settings.settings_schema import setting_value
+
+    return setting_value("courses", key)
+
+
 def _course_name(year: str) -> str:
     """What this product calls the year, from COURSES_NAME_PREFIX.
 
@@ -105,14 +115,14 @@ def _course_name(year: str) -> str:
     is put in front of the year. Either way the word naming the subject
     comes from the product's configuration, never from here.
     """
-    prefix = current_app.config.get("COURSES_NAME_PREFIX") or ""
+    prefix = _setting("name_prefix") or ""
     if "{" in prefix:
         return _fill(prefix, year, "COURSES_NAME_PREFIX").strip()
     return f"{prefix.rstrip()} {year}".strip()
 
 
 def _course_description(year: str) -> str:
-    template = current_app.config.get("COURSES_DESCRIPTION_TEMPLATE") or ""
+    template = _setting("description_template") or ""
     if not template:
         return ""
     return _fill(template, year, "COURSES_DESCRIPTION_TEMPLATE")
@@ -131,7 +141,12 @@ def _category_names(categories: str | None, empty: bool) -> list[str]:
                 "--categories held no names. Pass --empty to start with none."
             )
         return names
-    return list(current_app.config.get("COURSES_DEFAULT_CATEGORIES") or [])
+    configured = _setting("default_categories")
+    if isinstance(configured, str):
+        # From the panel it arrives as one line; from the environment it has
+        # already been split.
+        return [name.strip() for name in configured.split(",") if name.strip()]
+    return list(configured or [])
 
 
 # ── Moments ──────────────────────────────────────────────────────────────

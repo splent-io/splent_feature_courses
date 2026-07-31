@@ -50,7 +50,9 @@ def local_timezone() -> str:
     course is taught, and getting that wrong releases material an hour
     early for half the year.
     """
-    return current_app.config.get("COURSES_TIMEZONE") or "Europe/Madrid"
+    from splent_framework.settings.settings_schema import setting_value
+
+    return setting_value("courses", "timezone") or "Europe/Madrid"
 
 
 class CoursesService(BaseService):

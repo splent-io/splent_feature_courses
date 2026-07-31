@@ -557,7 +557,30 @@ def admin_course_copy(course_id):
     except ValueError as error:
         flash(str(error), "danger")
         return redirect(url_for("courses.admin_index"))
-    flash(_("Copied into %(name)s.", name=copy.name), "success")
+    # Say what came across. "Copied" on its own was true of a copy that
+    # silently left every file behind, and the person reading it had no
+    # reason to go and check.
+    report = courses_service.last_copy_report
+    flash(
+        _(
+            "Copied into %(name)s: %(pages)s page(s) and %(files)s file(s).",
+            name=copy.name,
+            pages=report["pages"],
+            files=report["files"],
+        ),
+        "success",
+    )
+    if report["missing"]:
+        # Named, not counted. A missing file is something somebody has to
+        # go and upload again, and they need to know which.
+        flash(
+            _(
+                "These files could not be copied and are missing from the new "
+                "course: %(names)s",
+                names=", ".join(report["missing"]),
+            ),
+            "danger",
+        )
     return redirect(url_for("courses.admin_course_edit", course_id=copy.id))
 
 

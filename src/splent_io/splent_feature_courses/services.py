@@ -69,6 +69,9 @@ class CoursesService(BaseService):
         self.attachments = PageAttachmentRepository()
         self.revisions = PageRevisionRepository()
         self.wiki = WikiRepository()
+        #: What the last copy_course managed and what it could not. Set
+        #: before any copying starts so a caller never reads a stale one.
+        self.last_copy_report = {"pages": 0, "files": 0, "missing": []}
 
     # ── Who is asking ────────────────────────────────────────────────────
 
@@ -397,9 +400,30 @@ class CoursesService(BaseService):
         Around thirty pages repeat every year and copying them by hand each
         September is the chore this removes. Nothing arrives released, so
         last year's dates cannot publish this year's material.
+
+        Everything means everything. This walked the categories and copied
+        their pages, which quietly dropped two things: a page belonging to
+        no section, which is what migrated material often is, and every
+        attachment, because nothing here touched them at all. A teacher
+        copying EGC 2024/2025 got sixty-one pages and none of its
+        fifty-two files, and no sign that anything was missing until a
+        student asked for the slides.
+
+        Files are copied rather than shared. detach_file deletes the stored
+        bytes with the attachment, so a shared item would mean removing a
+        file from this year's copy silently removing it from last year's
+        course as well.
+
+        Returns the new course. What could not be copied is reported
+        through ``last_copy_report``, because a partial copy a person is
+        told about is recoverable and a silent one is not.
         """
         course = self.create_course(name, source.description, hidden=True)
+        self.last_copy_report = {"pages": 0, "files": 0, "missing": []}
 
+        # Old category id -> new one, so pages can be hung off the right
+        # section in a single pass over the course's pages.
+        sections = {}
         for category in self.categories.list_for_course(source.id):
             copy = Category(
                 course_id=course.id,
@@ -410,20 +434,82 @@ class CoursesService(BaseService):
             )
             db.session.add(copy)
             db.session.flush()
-            for page in self.pages.list_for_category(category.id):
-                db.session.add(
-                    Page(
-                        course_id=course.id,
-                        category_id=copy.id,
-                        name=page.name,
-                        slug=self.unique_page_slug(course.id, page.slug),
-                        body_md=page.body_md,
-                        position=page.position,
-                        hidden=page.hidden,
-                    )
-                )
+            sections[category.id] = copy.id
+
+        # Every page of the course, not every page of every section. A page
+        # with no category is still the course's.
+        for page in self.pages.list_for_course(source.id):
+            new_page = Page(
+                course_id=course.id,
+                category_id=sections.get(page.category_id),
+                name=page.name,
+                slug=self.unique_page_slug(course.id, page.slug),
+                body_md=page.body_md,
+                position=page.position,
+                hidden=page.hidden,
+                # Deliberately not carried over: legacy_id identifies one
+                # page in the wiki this came from, and two rows claiming it
+                # would make a lookup by it ambiguous forever.
+            )
+            db.session.add(new_page)
+            db.session.flush()
+            self.last_copy_report["pages"] += 1
+            self._copy_attachments(page, new_page)
+
         db.session.commit()
         return course
+
+    def _copy_attachments(self, source_page: Page, target_page: Page) -> None:
+        """Give the copied page its own copy of every file.
+
+        Through the media service's public API, reading the stored bytes
+        and saving them as a new restricted item owned by the new page.
+        Reaching into the library's storage layout from here would be this
+        feature knowing where another one keeps its files.
+
+        A file whose bytes have gone missing is recorded and skipped. The
+        rest of the copy is worth having, and a name in a report is a
+        problem somebody can act on.
+        """
+        import io
+
+        from werkzeug.datastructures import FileStorage
+
+        from splent_framework.services.service_locator import get_service_class
+
+        attachments = self.attachments.list_for_page(source_page.id, kind=None)
+        if not attachments:
+            return
+
+        media = get_service_class(current_app._get_current_object(), "MediaService")()
+
+        for attachment in attachments:
+            item = media.get(attachment.media_item_id)
+            if item is None:
+                self.last_copy_report["missing"].append(attachment.name)
+                continue
+            try:
+                with open(media.file_path(item), "rb") as handle:
+                    payload = handle.read()
+            except OSError:
+                self.last_copy_report["missing"].append(attachment.name)
+                continue
+
+            upload = FileStorage(
+                stream=io.BytesIO(payload),
+                filename=item.filename,
+                content_type=item.mime_type or "application/octet-stream",
+            )
+            copied = self.attach_file(
+                target_page,
+                upload,
+                name=attachment.name or item.filename,
+                kind=attachment.kind,
+            )
+            if copied is None:
+                self.last_copy_report["missing"].append(attachment.name)
+            else:
+                self.last_copy_report["files"] += 1
 
     def create_category(self, course: Course, name: str, **fields) -> Category:
         category = Category(
